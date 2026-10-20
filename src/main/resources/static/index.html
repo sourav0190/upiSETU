@@ -284,38 +284,6 @@
                     </div>
                 </div>
 
-                <!-- 2-Minute Viva Pitch Cheatsheet -->
-                <div class="inspection-panel" style="margin-top: 24px;">
-                    <div class="inspection-panel-title" style="margin-bottom: 16px;">
-                        🎓 Engineering & Viva Defense Cheatsheet
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 14px;">
-                        <div>
-                            <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                                Q: How does MeshPay work without internet?
-                            </div>
-                            <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
-                                Sender locks payment data using the Bank's public key (RSA-OAEP + AES-GCM) and transmits it over Bluetooth Low Energy. The packet hops phone-to-phone via gossip routing until any device gets 4G signal and uploads it to the bank.
-                            </div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                                Q: Can intermediate stranger phones tamper with amount or steal the PIN?
-                            </div>
-                            <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
-                                No. Intermediate nodes only carry opaque ciphertext. Tampering with any bit fails AES-256-GCM authentication tag verification. Only the Central Bank's private key can decrypt the envelope.
-                            </div>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-                                Q: How is double-spending and duplicate delivery prevented?
-                            </div>
-                            <div style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5;">
-                                Each packet has a SHA-256 hash. The bank checks its idempotency cache upon receipt; duplicate packets uploaded by multiple phones are discarded immediately without decrypting or double-charging.
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
 
