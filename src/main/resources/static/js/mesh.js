@@ -7,7 +7,8 @@ class MeshNetwork {
     constructor() {
         this.bluetoothEnabled = true;
         this.permissionGranted = true;
-        this.peers = [
+        this.allPeers = [
+            { id: 'phone-alice', name: 'Alice Sharma', vpa: 'alice@demo', rssi: -52, dist: '0.8m', type: 'peer' },
             { id: 'phone-bob', name: 'Bob Verma (Merchant)', vpa: 'bob@demo', rssi: -58, dist: '1.2m', type: 'merchant' },
             { id: 'phone-carol', name: 'Carol Patel', vpa: 'carol@demo', rssi: -72, dist: '3.5m', type: 'peer' },
             { id: 'phone-dave', name: 'Dave Singh', vpa: 'dave@demo', rssi: -85, dist: '6.1m', type: 'peer' },
@@ -16,9 +17,9 @@ class MeshNetwork {
     }
 
     /**
-     * Scan for nearby BLE peers.
+     * Scan for nearby BLE peers, excluding the current user's VPA.
      */
-    async scanForPeers() {
+    async scanForPeers(excludeVpa = '') {
         if (!this.bluetoothEnabled) {
             throw new Error('BLUETOOTH_DISABLED: Turn on Bluetooth to discover nearby devices.');
         }
@@ -26,11 +27,14 @@ class MeshNetwork {
             throw new Error('PERMISSION_DENIED: Nearby Devices permission is required.');
         }
 
-        // Simulate 600ms discovery delay
-        await new Promise(r => setTimeout(r, 600));
+        // Simulate 400ms discovery delay
+        await new Promise(r => setTimeout(r, 400));
+
+        // Filter out self
+        const available = this.allPeers.filter(p => p.vpa !== excludeVpa);
 
         // Randomize RSSI slightly for realistic physical simulation
-        return this.peers.map(p => ({
+        return available.map(p => ({
             ...p,
             rssi: p.rssi + Math.floor(Math.random() * 5 - 2)
         }));
@@ -45,9 +49,9 @@ class MeshNetwork {
         }
 
         // Simulate connection handshake & packet transmission
-        await new Promise(r => setTimeout(r, 800));
+        await new Promise(r => setTimeout(r, 600));
 
-        // Inject packet into server mesh state if available so bridges can gossip it
+        // Inject packet into server mesh state so other devices & bridges can gossip it
         try {
             await fetch('/api/demo/send', {
                 method: 'POST',

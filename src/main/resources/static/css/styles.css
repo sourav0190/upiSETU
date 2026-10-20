@@ -339,6 +339,25 @@ body {
     height: 18px;
 }
 
+.user-select-dropdown {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    outline: none;
+    transition: all var(--transition-fast);
+}
+
+.user-select-dropdown:hover {
+    border-color: var(--brand-border);
+    background-color: var(--surface-secondary);
+}
+
 /* ==========================================================================
    Main Viewport & Screens
    ========================================================================== */

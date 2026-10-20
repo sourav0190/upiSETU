@@ -1,15 +1,25 @@
-/**
- * MeshPay Main Application Controller & UI Router
- * Orchestrates navigation, keypad, offline queue, sync engine, and soundbox synthesis.
- */
+const KNOWN_ACCOUNTS = {
+    'alice': { vpa: 'alice@demo', name: 'Alice Sharma', phone: '+91 98765 43210', initialBalance: 5000.00, initials: 'AS' },
+    'bob': { vpa: 'bob@demo', name: 'Bob Verma (Merchant)', phone: '+91 91234 56789', initialBalance: 1000.00, initials: 'BV' },
+    'carol': { vpa: 'carol@demo', name: 'Carol Patel', phone: '+91 99887 76655', initialBalance: 2500.00, initials: 'CP' },
+    'dave': { vpa: 'dave@demo', name: 'Dave Singh', phone: '+91 94567 12340', initialBalance: 500.00, initials: 'DS' }
+};
 
 class MeshApp {
     constructor() {
         this.currentScreen = 'easy-demo';
+
+        // Detect active demo identity from URL query param (?user=bob) or local storage
+        const urlParams = new URLSearchParams(window.location.search);
+        const userKey = (urlParams.get('user') || localStorage.getItem('meshpay_active_user') || 'alice').toLowerCase();
+        const profile = KNOWN_ACCOUNTS[userKey] || KNOWN_ACCOUNTS['alice'];
+
+        this.userKey = userKey in KNOWN_ACCOUNTS ? userKey : 'alice';
         this.currentUser = {
-            vpa: 'alice@demo',
-            name: 'Alice Sharma',
-            phone: '+91 98765 43210'
+            vpa: profile.vpa,
+            name: profile.name,
+            phone: profile.phone,
+            initials: profile.initials
         };
         this.isOnline = true;
         this.balanceHidden = false;
@@ -20,10 +30,11 @@ class MeshApp {
         this.enteredPin = '';
         this.paymentNote = '';
         this.historyFilter = 'ALL';
+        this.lastSeenTxCount = 0;
 
         // Wallet data
         this.wallet = {
-            balance: 5000.00,
+            balance: profile.initialBalance,
             offlineAllowanceLimit: 2000.00,
             offlineAllowanceSpent: 0.00,
             availableOfflineAllowance: 2000.00
@@ -38,8 +49,20 @@ class MeshApp {
         // Apply saved theme
         document.documentElement.setAttribute('data-theme', this.theme);
 
-        // Default to the visual walkthrough on startup
-        this.navigate('easy-demo');
+        // Sync header dropdown to active user
+        const selectEl = document.getElementById('user-profile-select');
+        if (selectEl) {
+            selectEl.value = this.userKey;
+        }
+
+        // If URL explicitly requests a screen, navigate there
+        const urlParams = new URLSearchParams(window.location.search);
+        const screenParam = urlParams.get('screen');
+        if (screenParam) {
+            this.navigate(screenParam);
+        } else {
+            this.navigate('easy-demo');
+        }
 
         // Initialize Web Crypto and IndexedDB
         if (window.meshCrypto) await window.meshCrypto.init();
@@ -54,8 +77,16 @@ class MeshApp {
         // Update Simulator balances
         await this.updateDemoBalances();
 
-        // Start Periodic Polling (every 4 seconds)
-        setInterval(() => this.backgroundSync(), 4000);
+        // Start Periodic Polling (every 3 seconds)
+        setInterval(() => this.backgroundSync(), 3000);
+    }
+
+    switchUser(key) {
+        localStorage.setItem('meshpay_active_user', key);
+        const url = new URL(window.location);
+        url.searchParams.set('user', key);
+        url.searchParams.set('screen', 'home');
+        window.location.href = url.toString();
     }
 
     setupEventListeners() {
@@ -129,6 +160,17 @@ class MeshApp {
                 const txRes = await fetch(`/api/v1/transactions?vpa=${this.currentUser.vpa}`);
                 if (txRes.ok) {
                     this.transactions = await txRes.json();
+
+                    // Automatic soundbox notification when a payment is received from another phone!
+                    if (this.lastSeenTxCount > 0 && this.transactions.length > this.lastSeenTxCount) {
+                        const latestTx = this.transactions[0];
+                        if (latestTx && latestTx.receiverVpa === this.currentUser.vpa) {
+                            this.announceSoundbox(parseFloat(latestTx.amount), latestTx.senderVpa);
+                            this.showToast(`Received ₹${parseFloat(latestTx.amount).toFixed(2)} from ${latestTx.senderVpa}`, 'success');
+                            this.logDemoEvent(`Incoming settlement: Received ₹${parseFloat(latestTx.amount).toFixed(2)} from ${latestTx.senderVpa}`);
+                        }
+                    }
+                    this.lastSeenTxCount = this.transactions.length;
                 }
             } catch (err) {
                 console.warn('Backend temporarily unavailable, using local cache:', err.message);
@@ -198,6 +240,14 @@ class MeshApp {
     // =========================================================================
 
     renderHome() {
+        // Update greeting & identity
+        const avatarEl = document.querySelector('.user-avatar-circle');
+        if (avatarEl) avatarEl.textContent = this.currentUser.initials || 'AS';
+        const nameEl = document.querySelector('.user-name-title');
+        if (nameEl) nameEl.textContent = this.currentUser.name;
+        const vpaChip = document.querySelector('.user-vpa-chip');
+        if (vpaChip) vpaChip.textContent = this.currentUser.vpa;
+
         const balanceEl = document.getElementById('home-balance-amount');
         if (balanceEl) {
             balanceEl.textContent = this.balanceHidden ? '••••••' : this.wallet.balance.toFixed(2);
@@ -269,7 +319,7 @@ class MeshApp {
         `;
 
         try {
-            const peers = await window.meshNetwork.scanForPeers();
+            const peers = await window.meshNetwork.scanForPeers(this.currentUser.vpa);
             peerListContainer.innerHTML = peers.map(p => `
                 <div class="peer-candidate-card" onclick="window.app.selectPeer('${p.id}', '${p.name}', '${p.vpa}')">
                     <div style="display: flex; align-items: center; gap: 12px;">

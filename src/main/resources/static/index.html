@@ -57,6 +57,14 @@
                 <span>Online (4G)</span>
             </button>
 
+            <!-- Active Profile / Device Identity Switcher -->
+            <select id="user-profile-select" class="user-select-dropdown" title="Switch active account on this device" onchange="window.app.switchUser(this.value)">
+                <option value="alice">👩 Alice (Sender)</option>
+                <option value="bob">👨 Bob (Merchant)</option>
+                <option value="carol">👩 Carol (Peer)</option>
+                <option value="dave">👨 Dave (Peer)</option>
+            </select>
+
             <!-- Light/Dark Mode Switcher -->
             <button class="icon-button" id="theme-toggle-btn" title="Toggle Light / Dark mode" aria-label="Toggle Theme">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
