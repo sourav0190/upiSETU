@@ -37,13 +37,10 @@ class MeshApp {
         // Apply theme
         document.documentElement.setAttribute('data-theme', this.theme);
 
-        // Check onboarding completion
-        const completedOnboarding = localStorage.getItem('meshpay_onboarding_done');
-        if (!completedOnboarding) {
-            this.navigate('onboarding');
-        } else {
-            this.navigate('home');
-        }
+        // Default to the easy visual walkthrough on startup
+        this.navigate('easy-demo');
+        const bottomNav = document.querySelector('.bottom-nav');
+        if (bottomNav) bottomNav.style.display = 'none';
 
         // Initialize Crypto and DB
         await window.meshCrypto.init();
@@ -804,6 +801,197 @@ class MeshApp {
             toast.style.transition = 'all 0.3s ease';
             setTimeout(() => toast.remove(), 300);
         }, 3200);
+    }
+
+    // =========================================================================
+    // Easy Interactive Visual Walkthrough Controller
+    // =========================================================================
+
+    switchMainMode(mode) {
+        const demoTab = document.getElementById('tab-easy-demo');
+        const appTab = document.getElementById('tab-app-mode');
+        const bottomNav = document.querySelector('.bottom-nav');
+
+        if (mode === 'demo') {
+            if (demoTab) demoTab.classList.add('active');
+            if (appTab) appTab.classList.remove('active');
+            if (bottomNav) bottomNav.style.display = 'none';
+            this.navigate('easy-demo');
+            this.updateDemoBalances();
+        } else {
+            if (appTab) appTab.classList.add('active');
+            if (demoTab) demoTab.classList.remove('active');
+            if (bottomNav) bottomNav.style.display = 'flex';
+            this.navigate('home');
+        }
+    }
+
+    async updateDemoBalances() {
+        try {
+            const accs = await fetch('/api/accounts').then(r => r.json());
+            const alice = accs.find(a => a.vpa === 'alice@demo');
+            const bob = accs.find(a => a.vpa === 'bob@demo');
+
+            const aliceEl = document.getElementById('demo-alice-balance');
+            const bobEl = document.getElementById('demo-bob-balance');
+            if (alice && aliceEl) aliceEl.textContent = `₹${parseFloat(alice.balance).toFixed(2)}`;
+            if (bob && bobEl) bobEl.textContent = `₹${parseFloat(bob.balance).toFixed(2)}`;
+
+            const state = await fetch('/api/mesh/state').then(r => r.json());
+            const totalPackets = state.devices.reduce((acc, d) => acc + d.packetCount, 0);
+            const packetsEl = document.getElementById('demo-mesh-packets');
+            if (packetsEl) packetsEl.textContent = totalPackets;
+
+            const txs = await fetch('/api/transactions').then(r => r.json());
+            const settledEl = document.getElementById('demo-settled-count');
+            if (settledEl) settledEl.textContent = txs.filter(t => t.status === 'SETTLED').length;
+        } catch (e) {
+            console.log('Error updating demo balances:', e.message);
+        }
+    }
+
+    async executeDemoStep(step) {
+        const storyEl = document.getElementById('demo-story-text');
+
+        if (step === 1) {
+            // Step 1: Alice creates & injects packet
+            document.querySelectorAll('.walkthrough-step-card').forEach(c => c.classList.remove('completed'));
+            document.getElementById('step-card-1').classList.add('completed');
+
+            document.getElementById('node-alice').className = 'flow-node active has-packet';
+            document.getElementById('connector-1').className = 'flow-connector active';
+            document.getElementById('node-strangers').className = 'flow-node';
+            document.getElementById('connector-2').className = 'flow-connector';
+            document.getElementById('node-bridge').className = 'flow-node';
+            document.getElementById('connector-3').className = 'flow-connector';
+            document.getElementById('node-bank').className = 'flow-node';
+
+            storyEl.innerHTML = `
+                <strong>Step 1 (Offline Encryption):</strong> Alice enters ₹500 & PIN 1234 in the basement.
+                Her phone generates a 256-bit AES key, encrypts the payment with AES-GCM, and encrypts the key with the Central Bank's RSA Public Key.
+                Packet locked into an envelope and dropped into local mesh (TTL=5).
+            `;
+
+            // Trigger backend demo inject
+            await fetch('/api/demo/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    senderVpa: 'alice@demo',
+                    receiverVpa: 'bob@demo',
+                    amount: 500.00,
+                    pin: '1234',
+                    ttl: 5,
+                    startDevice: 'phone-alice'
+                })
+            });
+
+            this.showToast('Step 1: Alice created & encrypted offline packet!', 'success');
+            await this.updateDemoBalances();
+
+        } else if (step === 2) {
+            // Step 2: Mesh gossip round
+            document.getElementById('step-card-2').classList.add('completed');
+
+            document.getElementById('node-alice').className = 'flow-node';
+            document.getElementById('connector-1').className = 'flow-connector active';
+            document.getElementById('node-strangers').className = 'flow-node active has-packet';
+            document.getElementById('connector-2').className = 'flow-connector active';
+            document.getElementById('node-bridge').className = 'flow-node active has-packet';
+
+            storyEl.innerHTML = `
+                <strong>Step 2 (P2P Mesh Gossip):</strong> Nearby offline phones exchange packets over Bluetooth Low Energy.
+                TTL decreases from 5 to 4. Strangers hold the locked envelope but <em>CANNOT read or modify</em> the payment!
+            `;
+
+            await fetch('/api/mesh/gossip', { method: 'POST' });
+            this.showToast('Step 2: Packet hopped to nearby phones via BLE!', 'sync');
+            await this.updateDemoBalances();
+
+        } else if (step === 3) {
+            // Step 3: Bridge node hits 4G
+            document.getElementById('step-card-3').classList.add('completed');
+
+            document.getElementById('node-strangers').className = 'flow-node';
+            document.getElementById('node-bridge').className = 'flow-node active has-packet';
+            document.getElementById('connector-3').className = 'flow-connector active';
+            document.getElementById('node-bank').className = 'flow-node active';
+
+            storyEl.innerHTML = `
+                <strong>Step 3 (Gateway Ingress):</strong> The bridge node walks outside the basement into 4G LTE coverage.
+                It automatically detects internet connectivity and sends an HTTPS POST to <code>/api/bridge/ingest</code>.
+            `;
+
+            this.showToast('Step 3: Bridge node detected 4G coverage!', 'online');
+            await this.updateDemoBalances();
+
+        } else if (step === 4) {
+            // Step 4: Bank settles
+            document.getElementById('step-card-4').classList.add('completed');
+
+            document.getElementById('node-bridge').className = 'flow-node';
+            document.getElementById('connector-3').className = 'flow-connector active';
+            document.getElementById('node-bank').className = 'flow-node active has-packet';
+
+            storyEl.innerHTML = `
+                <strong>Step 4 (ACID Settlement):</strong> Central Bank receives the packet!
+                <br>1. Checks SHA-256(ciphertext) to drop duplicate uploads with 0 decryption cost.
+                <br>2. Decrypts with RSA Private Key & verifies PIN hash.
+                <br>3. Debits ₹500 from Alice and credits ₹500 to Bob atomically. <strong>SETTLED!</strong>
+            `;
+
+            await fetch('/api/mesh/flush', { method: 'POST' });
+
+            this.announceSoundbox(500, 'Bob Verma');
+            this.showToast('Step 4: Central Bank settled ₹500 on ledger!', 'success');
+            await this.updateDemoBalances();
+        }
+    }
+
+    async runAutoDemo() {
+        const btn = document.getElementById('btn-auto-demo');
+        if (btn) btn.disabled = true;
+
+        await this.resetDemoFlow();
+        await new Promise(r => setTimeout(r, 600));
+
+        await this.executeDemoStep(1);
+        await new Promise(r => setTimeout(r, 2600));
+
+        await this.executeDemoStep(2);
+        await new Promise(r => setTimeout(r, 2600));
+
+        await this.executeDemoStep(3);
+        await new Promise(r => setTimeout(r, 2600));
+
+        await this.executeDemoStep(4);
+
+        if (btn) btn.disabled = false;
+    }
+
+    async resetDemoFlow() {
+        try {
+            await fetch('/api/mesh/reset', { method: 'POST' });
+            document.querySelectorAll('.walkthrough-step-card').forEach(c => c.classList.remove('completed'));
+            document.getElementById('connector-1').className = 'flow-connector';
+            document.getElementById('connector-2').className = 'flow-connector';
+            document.getElementById('connector-3').className = 'flow-connector';
+            document.getElementById('node-alice').className = 'flow-node active has-packet';
+            document.getElementById('node-strangers').className = 'flow-node';
+            document.getElementById('node-bridge').className = 'flow-node';
+            document.getElementById('node-bank').className = 'flow-node';
+
+            const storyEl = document.getElementById('demo-story-text');
+            if (storyEl) {
+                storyEl.innerHTML = `
+                    Reset complete! Tap <strong>"▶️ Auto-Play 1-Click Demo"</strong> or tap Step 1 to begin.
+                `;
+            }
+            this.showToast('Demo state and mesh cache reset.', 'info');
+            await this.updateDemoBalances();
+        } catch (e) {
+            console.log('Reset error:', e.message);
+        }
     }
 }
 

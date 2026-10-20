@@ -45,8 +45,190 @@
         </div>
     </header>
 
+    <!-- Mode Switcher Bar (Easy Visual Demo vs Fintech App) -->
+    <div class="mode-switcher-bar">
+        <button class="mode-tab-btn active" id="tab-easy-demo" onclick="window.app.switchMainMode('demo')">
+            🎮 Easy Visual Demo
+        </button>
+        <button class="mode-tab-btn" id="tab-app-mode" onclick="window.app.switchMainMode('app')">
+            📱 Fintech App
+        </button>
+    </div>
+
     <!-- Main Viewport Router -->
     <main class="viewport">
+
+        <!-- ===============================================================
+             Screen: Easy Interactive Visual Walkthrough
+             =============================================================== -->
+        <section class="view-screen active" id="screen-easy-demo">
+            <div style="margin-bottom: 12px; text-align: center;">
+                <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 2px;">Offline Mesh Payment Flow</h2>
+                <p style="font-size: 0.76rem; color: var(--text-muted);">Watch money travel through strangers' phones without internet</p>
+            </div>
+
+            <!-- Visual Node Flow Map -->
+            <div class="node-map-container">
+                <div class="node-flow">
+                    <!-- Node 1: Alice -->
+                    <div class="flow-node active has-packet" id="node-alice">
+                        <div class="node-icon-bubble">📱</div>
+                        <span class="node-title">Alice</span>
+                        <span class="node-sub">Basement (No 4G)</span>
+                    </div>
+
+                    <div class="flow-connector" id="connector-1"></div>
+
+                    <!-- Node 2: Strangers Gossip -->
+                    <div class="flow-node" id="node-strangers">
+                        <div class="node-icon-bubble">👥</div>
+                        <span class="node-title">Strangers</span>
+                        <span class="node-sub">BLE Gossip (Offline)</span>
+                    </div>
+
+                    <div class="flow-connector" id="connector-2"></div>
+
+                    <!-- Node 3: Bridge Phone -->
+                    <div class="flow-node" id="node-bridge">
+                        <div class="node-icon-bubble">📶</div>
+                        <span class="node-title">Bridge</span>
+                        <span class="node-sub">Walks to 4G</span>
+                    </div>
+
+                    <div class="flow-connector" id="connector-3"></div>
+
+                    <!-- Node 4: Bank -->
+                    <div class="flow-node" id="node-bank">
+                        <div class="node-icon-bubble">🏦</div>
+                        <span class="node-title">Central Bank</span>
+                        <span class="node-sub">Core Ledger</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Storyteller Explanation Box -->
+            <div class="storyteller-card">
+                <div class="storyteller-label">
+                    <span>💡 LIVE STORYTELLER</span>
+                </div>
+                <div class="storyteller-text" id="demo-story-text">
+                    Ready! Tap <strong>"▶️ Auto-Play 1-Click Demo"</strong> to watch the entire offline payment journey happen automatically in 10 seconds.
+                </div>
+            </div>
+
+            <!-- Primary Action Buttons -->
+            <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+                <button class="btn btn-primary" id="btn-auto-demo" onclick="window.app.runAutoDemo()" style="flex: 2;">
+                    ▶️ Auto-Play 1-Click Demo
+                </button>
+                <button class="btn btn-secondary" onclick="window.app.resetDemoFlow()" style="flex: 1;">
+                    🔄 Reset
+                </button>
+            </div>
+
+            <!-- 4 Interactive Step Cards -->
+            <div style="margin-bottom: 14px;">
+                <div style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                    Or Execute Step-by-Step:
+                </div>
+
+                <!-- Step 1 -->
+                <div class="walkthrough-step-card" id="step-card-1" onclick="window.app.executeDemoStep(1)">
+                    <div class="step-left-col">
+                        <div class="step-num-badge">1</div>
+                        <div class="step-info-col">
+                            <span class="step-name">Alice Sends ₹500 (Offline)</span>
+                            <span class="step-desc">Phone encrypts with Bank's RSA key & drops into mesh</span>
+                        </div>
+                    </div>
+                    <button class="step-btn-pill">Send</button>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="walkthrough-step-card" id="step-card-2" onclick="window.app.executeDemoStep(2)">
+                    <div class="step-left-col">
+                        <div class="step-num-badge">2</div>
+                        <div class="step-info-col">
+                            <span class="step-name">Gossip Hop Across Crowd</span>
+                            <span class="step-desc">Packet hops phone-to-phone via BLE; TTL counter drops</span>
+                        </div>
+                    </div>
+                    <button class="step-btn-pill">Hop</button>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="walkthrough-step-card" id="step-card-3" onclick="window.app.executeDemoStep(3)">
+                    <div class="step-left-col">
+                        <div class="step-num-badge">3</div>
+                        <div class="step-info-col">
+                            <span class="step-name">Bridge Phone Hits 4G</span>
+                            <span class="step-desc">Stranger walks outside and uploads packet over HTTPS</span>
+                        </div>
+                    </div>
+                    <button class="step-btn-pill">Upload</button>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="walkthrough-step-card" id="step-card-4" onclick="window.app.executeDemoStep(4)">
+                    <div class="step-left-col">
+                        <div class="step-num-badge">4</div>
+                        <div class="step-info-col">
+                            <span class="step-name">Central Bank Settles</span>
+                            <span class="step-desc">Bank checks PIN, drops duplicates, & credits Bob</span>
+                        </div>
+                    </div>
+                    <button class="step-btn-pill">Settle</button>
+                </div>
+            </div>
+
+            <!-- Live Ledger Snapshot -->
+            <div class="card" style="padding: 14px; margin-bottom: 14px;">
+                <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 8px;">Live Account Balances</div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px;">
+                    <span>👩 Alice Balance:</span>
+                    <strong id="demo-alice-balance" style="color: var(--brand-primary); font-family: var(--font-mono);">₹5,000.00</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px;">
+                    <span>👨 Bob Balance:</span>
+                    <strong id="demo-bob-balance" style="color: var(--brand-primary); font-family: var(--font-mono);">₹1,000.00</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border-subtle); padding-top: 6px;">
+                    <span>Packets in Relay Mesh: <strong id="demo-mesh-packets" style="color: var(--text-primary);">0</strong></span>
+                    <span>Total Settled: <strong id="demo-settled-count" style="color: var(--text-primary);">0</strong></span>
+                </div>
+            </div>
+
+            <!-- 2-Minute Viva Pitch & Cheatsheet -->
+            <div class="cheatsheet-card">
+                <div style="font-size: 0.88rem; font-weight: 800; margin-bottom: 6px;">
+                    🎤 2-Minute Viva Cheatsheet (Easy Explanations)
+                </div>
+                <div class="cheatsheet-item">
+                    <div class="cheatsheet-q">Q: What is this project in simple words?</div>
+                    <div class="cheatsheet-a">
+                        Jab dono phones me internet nahi hota (jaise basement me), tab payment phone-to-phone Bluetooth ke through hop karti hai aur jab koi stranger bahar 4G me aata hai, wo bank ko deliver kar deta hai.
+                    </div>
+                </div>
+                <div class="cheatsheet-item">
+                    <div class="cheatsheet-q">Q: Can intermediate strangers steal money or change the amount?</div>
+                    <div class="cheatsheet-a">
+                        No. The payment note is locked with the Central Bank's RSA public key and AES-256-GCM. Strangers only see opaque ciphertext. Any bit-flip fails authentication.
+                    </div>
+                </div>
+                <div class="cheatsheet-item">
+                    <div class="cheatsheet-q">Q: What if 3 different phones upload the same packet?</div>
+                    <div class="cheatsheet-a">
+                        The bank hashes the ciphertext (SHA-256). The first copy settles; copies 2 and 3 are dropped immediately as duplicates without charging twice.
+                    </div>
+                </div>
+                <div class="cheatsheet-item">
+                    <div class="cheatsheet-q">Q: How do you prevent offline double-spending?</div>
+                    <div class="cheatsheet-a">
+                        Offline spending is capped at ₹2,000 (like RBI UPI Lite). When reconnecting, the bank settles on a first-come-first-served basis.
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- ===============================================================
              Screen A: Onboarding
