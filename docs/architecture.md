@@ -1,8 +1,12 @@
 # MeshPay — Secure Offline Payment Experience
 ## Architecture and Technical Design Specification
 
-### 1. Executive Summary & Product Vision
-**MeshPay** is an offline-first, store-and-forward peer-to-peer digital payment prototype. It is modeled on real-world fintech workflows (Google Pay, PhonePe, UPI Lite) to demonstrate how nearby devices can securely initiate and route deferred payment promises without an active cellular or internet connection, settling with the backend ledger once connectivity is restored.
+### 1. Executive Summary & Problem Formulation
+In high-growth digital economies like India, the Unified Payments Interface (UPI) handles billions of monthly transactions. However, standard UPI relies strictly on **synchronous, persistent 4G/5G internet connectivity** across all three participants: the sender, the receiver, and the core banking system (CBS).
+
+When users enter **zero-connectivity physical environments** (e.g. underground metro basements, basement parking lots, remote rural weekly haats, disaster zones, or overcrowded stadium concerts where cellular towers experience denial-of-service), digital payments fail completely, forcing users back to physical cash.
+
+**MeshPay** is an engineering research prototype of an **Offline-First Delay-Tolerant Payment Protocol (DTN)**. Modeled on **RBI / NPCI UPI Lite and National Common Mobility Card (NCMC) offline architectures**, MeshPay allows two offline mobile devices to exchange an authenticated, tamper-proof payment promise over Bluetooth Low Energy (BLE). The encrypted envelope hops through nearby carrier devices until an opportunistic bridge device reaches cellular connectivity and commits the transaction to the bank ledger.
 
 ```
 +---------------------------------------------------------------------------------------------------+
@@ -24,7 +28,7 @@
                                                                              | (Spring Boot 3.3.5 / Java) |
                                                                              |----------------------------|
                                                                              | 1. SHA-256 Deduplication   |
-                                                                             | 2. Idempotency Gate (Redis)|
+                                                                             | 2. Idempotency Gate (Cache)|
                                                                              | 3. RSA-OAEP Decryption     |
                                                                              | 4. Freshness Replay Filter |
                                                                              | 5. @Transactional Ledger   |
@@ -39,7 +43,12 @@
                                                                              +----------------------------+
 ```
 
----
+#### Academic Standards & Theoretical Precedents:
+1. **RFC 5050 (Delay-Tolerant Networking Bundle Protocol Architecture)**: Endorsed by the IETF for opportunistic store-and-forward communication in intermittently connected networks.
+2. **RFC 5116 (Authenticated Encryption with Associated Data - AEAD)**: Mandates AES-256-GCM to guarantee both confidentiality and cryptographic integrity with a 128-bit authentication tag.
+3. **Apple 'Find My' Network Model**: Proven real-world precedent where hundreds of millions of stranger devices securely relay opaque, encrypted Bluetooth payloads without inspecting or altering content.
+4. **Reserve Bank of India (RBI) Regulatory Framework on Offline Payments (2022-2023)**: Formalized offline wallet caps (₹2,000 max limit) and deferred settlement guidelines for contactless transit.
+
 
 ### 2. Repository Audit: Baseline vs. Upgraded System
 
