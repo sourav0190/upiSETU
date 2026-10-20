@@ -18,9 +18,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Helper service that:
- *   - seeds demo accounts on startup
- *   - simulates "sender phone creates an encrypted packet" flow
+ * Seeds demo accounts with default PINs and simulates device-side packet generation.
  */
 @Service
 public class DemoService {
@@ -34,23 +32,24 @@ public class DemoService {
     @PostConstruct
     public void seedAccounts() {
         if (accounts.count() == 0) {
-            accounts.save(new Account("alice@demo", "Alice",   new BigDecimal("5000.00")));
-            accounts.save(new Account("bob@demo",   "Bob",     new BigDecimal("1000.00")));
-            accounts.save(new Account("carol@demo", "Carol",   new BigDecimal("2500.00")));
-            accounts.save(new Account("dave@demo",  "Dave",    new BigDecimal("500.00")));
-            log.info("Seeded 4 demo accounts");
+            try {
+                String defaultPinHash = sha256Hex("1234");
+                accounts.save(new Account("alice@demo", "Alice Sharma", new BigDecimal("5000.00"), defaultPinHash));
+                accounts.save(new Account("bob@demo",   "Bob Verma",    new BigDecimal("1000.00"), defaultPinHash));
+                accounts.save(new Account("carol@demo", "Carol Patel",  new BigDecimal("2500.00"), defaultPinHash));
+                accounts.save(new Account("dave@demo",  "Dave Singh",   new BigDecimal("500.00"),  defaultPinHash));
+                log.info("Seeded 4 demo accounts with default PIN 1234");
+            } catch (Exception e) {
+                log.error("Failed to seed demo accounts", e);
+            }
         }
     }
 
     /**
-     * Simulates the sender's phone:
-     *   1. Build a PaymentInstruction with a fresh nonce + signedAt timestamp.
-     *   2. Encrypt with the server's public key (hybrid RSA+AES).
-     *   3. Wrap in a MeshPacket with TTL.
-     *
-     * In a real Android app, this exact code (minus the server-side reference)
-     * would run on the phone. The phone would have already cached the server's
-     * public key during a previous online session.
+     * Simulates the sender's phone creating an authenticated, encrypted packet:
+     *   1. Build PaymentInstruction with UUID nonce + signedAt timestamp.
+     *   2. Encrypt with server's RSA public key (hybrid RSA-OAEP + AES-GCM).
+     *   3. Wrap into MeshPacket with TTL.
      */
     public MeshPacket createPacket(String senderVpa, String receiverVpa,
                                    BigDecimal amount, String pin, int ttl) throws Exception {
@@ -73,7 +72,7 @@ public class DemoService {
         return packet;
     }
 
-    private String sha256Hex(String input) throws Exception {
+    public String sha256Hex(String input) throws Exception {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] hash = md.digest(input.getBytes());
         StringBuilder hex = new StringBuilder();

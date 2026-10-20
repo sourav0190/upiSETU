@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: meshpay-postgres
+    environment:
+      POSTGRES_DB: meshpay_db
+      POSTGRES_USER: meshpay_user
+      POSTGRES_PASSWORD: meshpay_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meshpay_user -d meshpay_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  meshpay:
+    build: .
+    container_name: meshpay-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/meshpay_db
+      SPRING_DATASOURCE_USERNAME: meshpay_user
+      SPRING_DATASOURCE_PASSWORD: meshpay_password
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  pgdata:

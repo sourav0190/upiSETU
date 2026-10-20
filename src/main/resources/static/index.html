@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MeshPay — Secure Offline Payment Experience</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<div class="toast-container" id="toast-container"></div>
+
+<div class="app-wrapper">
+    <!-- Header & Status Bar -->
+    <header class="app-header">
+        <div class="brand-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            <span>MeshPay</span>
+        </div>
+
+        <div class="header-actions">
+            <div class="network-pill online" id="network-status-pill" title="Click to toggle between 4G and Offline Basement mode">
+                <span class="pulse-dot"></span>
+                <span>🌐 Online (4G)</span>
+            </div>
+
+            <button class="icon-btn" id="theme-toggle-btn" title="Toggle Light / Dark mode" aria-label="Toggle Theme">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/>
+                    <line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/>
+                    <line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Viewport Router -->
+    <main class="viewport">
+
+        <!-- ===============================================================
+             Screen A: Onboarding
+             =============================================================== -->
+        <section class="view-screen" id="screen-onboarding">
+            <div style="text-align: center; padding: 24px 8px 16px 8px;">
+                <div style="width: 80px; height: 80px; border-radius: 50%; background: var(--brand-surface); color: var(--brand-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+                    <svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+                        <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+                        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+                        <line x1="12" y1="20" x2="12.01" y2="20"/>
+                    </svg>
+                </div>
+                <h1 style="font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px;">
+                    Pay Offline Anywhere
+                </h1>
+                <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.4; margin-bottom: 24px;">
+                    Experience peer-to-peer digital payments without active internet or cellular towers. Powered by store-and-forward mesh routing.
+                </p>
+            </div>
+
+            <div class="card" style="margin-bottom: 14px;">
+                <div style="display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px;">
+                    <span style="font-size: 1.3rem;">📡</span>
+                    <div>
+                        <div style="font-size: 0.9rem; font-weight: 700;">Peer-to-Peer Relay</div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">Encrypted packets hop phone-to-phone via BLE gossip until a device reaches 4G signal.</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px;">
+                    <span style="font-size: 1.3rem;">🔐</span>
+                    <div>
+                        <div style="font-size: 0.9rem; font-weight: 700;">Zero-Trust Encryption</div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">Hybrid RSA-2048-OAEP + AES-256-GCM guarantees no intermediate device can view or alter your PIN or amount.</div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 14px; align-items: flex-start;">
+                    <span style="font-size: 1.3rem;">🛡️</span>
+                    <div>
+                        <div style="font-size: 0.9rem; font-weight: 700;">Offline Spending Allowance</div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">Capped at ₹2,000 to prevent offline double-spending, strictly verified upon central ledger settlement.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: rgba(217, 119, 6, 0.1); border: 1px solid rgba(217, 119, 6, 0.25); border-radius: var(--radius-md); padding: 12px; margin-bottom: 24px; font-size: 0.75rem; color: var(--accent-amber);">
+                <strong>Prototype Notice:</strong> All wallet balances and transactions in MeshPay are simulated for academic and engineering demonstration. No real bank accounts are debited.
+            </div>
+
+            <button class="btn btn-primary" onclick="localStorage.setItem('meshpay_onboarding_done', 'true'); window.app.navigate('home');">
+                Enter MeshPay Dashboard
+            </button>
+        </section>
+
+        <!-- ===============================================================
+             Screen B: Home Dashboard
+             =============================================================== -->
+        <section class="view-screen" id="screen-home">
+            <!-- Greeting & Avatar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div class="tx-avatar" style="background: var(--brand-surface); color: var(--brand-primary); width: 44px; height: 44px; font-size: 1.05rem;">
+                        AS
+                    </div>
+                    <div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 500;">Welcome back,</div>
+                        <div style="font-size: 1.05rem; font-weight: 700;">Alice Sharma</div>
+                    </div>
+                </div>
+                <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted); background: var(--surface-tertiary); padding: 4px 8px; border-radius: var(--radius-sm);">
+                    alice@demo
+                </div>
+            </div>
+
+            <!-- Wallet Hero Card -->
+            <div class="wallet-hero-card card">
+                <div class="wallet-label-row">
+                    <span>Simulated Wallet Balance</span>
+                    <button id="toggle-balance-eye" style="background: none; border: none; color: var(--text-muted); cursor: pointer;" aria-label="Toggle balance visibility">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                            <path id="eye-icon-path" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="balance-display">
+                    <span class="currency-sym">₹</span>
+                    <span class="balance-amount" id="home-balance-amount">5,000.00</span>
+                </div>
+
+                <!-- Offline Spending Allowance Meter -->
+                <div style="margin-top: 8px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">
+                        <span>Offline Spending Allowance</span>
+                        <span id="home-available-allowance" style="color: var(--brand-primary);">₹2,000.00</span>
+                    </div>
+                    <div class="allowance-bar-container">
+                        <div class="allowance-bar-fill" id="allowance-fill-bar" style="width: 100%;"></div>
+                    </div>
+                    <div class="allowance-meta">
+                        <span>Available offline cap</span>
+                        <span>Max Cap: ₹2,000.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Action Tiles -->
+            <div class="quick-actions-grid">
+                <div class="action-tile" onclick="window.app.navigate('pay')">
+                    <div class="action-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                    </div>
+                    <span class="action-title">Pay Nearby</span>
+                </div>
+
+                <div class="action-tile" onclick="window.app.navigate('receive')">
+                    <div class="action-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"/>
+                            <rect x="14" y="3" width="7" height="7"/>
+                            <rect x="14" y="14" width="7" height="7"/>
+                            <rect x="3" y="14" width="7" height="7"/>
+                        </svg>
+                    </div>
+                    <span class="action-title">Receive</span>
+                </div>
+
+                <div class="action-tile" onclick="window.app.navigate('sync')">
+                    <div class="action-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="1 4 1 10 7 10"/>
+                            <polyline points="23 20 23 14 17 14"/>
+                            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+                        </svg>
+                    </div>
+                    <span class="action-title">Sync Centre</span>
+                </div>
+            </div>
+
+            <!-- Mesh Status Card -->
+            <div class="card" style="padding: 14px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.1rem;">📡</span>
+                        <div>
+                            <div style="font-size: 0.85rem; font-weight: 700;">Delay-Tolerant Mesh Status</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">4 virtual nodes listening • 1 bridge node with 4G</div>
+                        </div>
+                    </div>
+                    <span class="badge badge-settled" style="font-size: 0.65rem;">BLE Ready</span>
+                </div>
+            </div>
+
+            <!-- Recent Transactions List -->
+            <div class="section-header">
+                <span class="section-title">Recent Activity</span>
+                <span class="view-all-link" onclick="window.app.navigate('history')">View all</span>
+            </div>
+
+            <div id="home-recent-txs"></div>
+        </section>
+
+        <!-- ===============================================================
+             Screen C: Pay Nearby Journey
+             =============================================================== -->
+        <section class="view-screen" id="screen-pay">
+            <!-- Step 1: Device Discovery Radar -->
+            <div id="pay-step-discovery">
+                <div style="text-align: center; margin-bottom: 12px;">
+                    <h2 style="font-size: 1.25rem; font-weight: 800;">Pay Nearby Devices</h2>
+                    <p style="font-size: 0.78rem; color: var(--text-muted);">Discovering nearby phones over Bluetooth Low Energy</p>
+                </div>
+
+                <div class="radar-container">
+                    <div class="radar-circle"></div>
+                    <div class="radar-circle"></div>
+                    <div class="radar-circle"></div>
+                    <div class="radar-center-icon">
+                        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="2" x2="12" y2="22"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="section-header" style="margin-top: 18px;">
+                    <span class="section-title">Devices in BLE Proximity</span>
+                    <span class="view-all-link" onclick="window.app.initPayScreen()">Rescan</span>
+                </div>
+
+                <div class="peer-list" id="nearby-peers-list"></div>
+            </div>
+
+            <!-- Step 2: Amount Keypad Screen -->
+            <div id="pay-step-keypad" style="display: none;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                    <button class="icon-btn" onclick="window.app.initPayScreen()" aria-label="Back">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="19" y1="12" x2="5" y2="12"/>
+                            <polyline points="12 19 5 12 12 5"/>
+                        </svg>
+                    </button>
+                    <span style="font-weight: 700; font-size: 0.95rem;">Enter Amount</span>
+                    <div style="width: 36px;"></div>
+                </div>
+
+                <!-- Recipient Card -->
+                <div class="card" style="padding: 12px 16px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="tx-avatar" style="background: var(--brand-surface); color: var(--brand-primary);">
+                            ✓
+                        </div>
+                        <div>
+                            <div id="pay-recipient-name" style="font-weight: 700; font-size: 0.92rem;">Bob Verma</div>
+                            <div id="pay-recipient-vpa" style="font-size: 0.75rem; color: var(--text-muted);">bob@demo</div>
+                        </div>
+                    </div>
+                    <span class="badge badge-settled">Verified Peer</span>
+                </div>
+
+                <!-- Amount Display -->
+                <div class="amount-input-box">
+                    <div class="amount-display-value" id="pay-amount-display">₹0</div>
+                    <div id="pay-amount-error" style="color: var(--accent-red); font-size: 0.78rem; font-weight: 600; margin-top: 4px; display: none;"></div>
+                </div>
+
+                <!-- Quick Amount Pills -->
+                <div class="quick-amount-row">
+                    <button class="pill-amount-btn" onclick="window.app.addQuickAmount(50)">+₹50</button>
+                    <button class="pill-amount-btn" onclick="window.app.addQuickAmount(100)">+₹100</button>
+                    <button class="pill-amount-btn" onclick="window.app.addQuickAmount(500)">+₹500</button>
+                </div>
+
+                <!-- Numeric Keypad Grid -->
+                <div class="keypad-grid">
+                    <button class="key-btn" onclick="window.app.keypadInput('1')">1</button>
+                    <button class="key-btn" onclick="window.app.keypadInput('2')">2</button>
+                    <button class="key-btn" onclick="window.app.keypadInput('3')">3</button>
+                    <button class="key-btn" onclick="window.app.keypadInput('4')">4</button>
+                    <button class="key-btn" onclick="window.app.keypadInput('5')">5</button>
+                    <button class="key-btn" onclick="window.app.keypadInput('6')">6</button>
+                    <button class="key-btn" onclick="window.app.keypadInput('7')">7</button>
+                    <button class="key-btn" onclick="window.app.keypadInput('8')">8</button>
+                    <button class="key-btn" onclick="window.app.keypadInput('9')">9</button>
+                    <button class="key-btn" onclick="window.app.keypadInput('.')">.</button>
+                    <button class="key-btn" onclick="window.app.keypadInput('0')">0</button>
+                    <button class="key-btn" onclick="window.app.keypadInput('backspace')">⌫</button>
+                </div>
+
+                <div style="margin-top: 18px;">
+                    <button class="btn btn-primary" id="pay-proceed-btn" disabled onclick="window.app.openPinModal()">
+                        Authorize Offline Payment
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Success / Queued Screen -->
+            <div id="pay-step-success" style="display: none; text-align: center; padding: 20px 8px;">
+                <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--brand-surface); color: var(--brand-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;">
+                    <svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                </div>
+
+                <h2 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 4px;">Payment Promise Queued</h2>
+                <div id="success-amount" style="font-size: 2.2rem; font-weight: 800; color: var(--brand-primary); margin-bottom: 4px;">₹0.00</div>
+                <div id="success-recipient" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;"></div>
+
+                <div class="card" style="text-align: left; padding: 14px; font-size: 0.78rem; margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="color: var(--text-muted);">Packet ID:</span>
+                        <span id="success-packet-id" style="font-family: var(--font-mono); font-weight: 600;"></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                        <span style="color: var(--text-muted);">Idempotency Hash:</span>
+                        <span id="success-hash-preview" style="font-family: var(--font-mono); font-weight: 600;"></span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Local Status:</span>
+                        <span class="badge badge-queued">RECEIVED_LOCALLY</span>
+                    </div>
+                </div>
+
+                <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid var(--brand-border); border-radius: var(--radius-md); padding: 12px; margin-bottom: 24px; font-size: 0.74rem; color: var(--text-secondary); text-align: left;">
+                    💡 <strong>What happened:</strong> An authenticated AES-256-GCM + RSA-OAEP envelope was stored in your device's persistent queue and transmitted to the recipient over BLE. When a bridge device gets 4G signal, it will settle automatically.
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="window.app.navigate('sync')">View in Sync Centre</button>
+                    <button class="btn btn-primary" onclick="window.app.navigate('home')">Back to Home</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===============================================================
+             Screen D: Receive Payment
+             =============================================================== -->
+        <section class="view-screen" id="screen-receive">
+            <div style="text-align: center; margin-bottom: 16px;">
+                <h2 style="font-size: 1.25rem; font-weight: 800;">Receive Offline Payment</h2>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">Display QR for peer pairing or listen for BLE packets</p>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 16px;" id="receive-qr-container"></div>
+
+            <div class="card" style="text-align: center; padding: 14px; margin-bottom: 16px;">
+                <div id="receive-name-text" style="font-size: 1rem; font-weight: 700;">Alice Sharma</div>
+                <div id="receive-vpa-text" style="font-size: 0.85rem; font-family: var(--font-mono); color: var(--brand-primary); margin-top: 2px;">alice@demo</div>
+            </div>
+
+            <!-- Simulated Soundbox Component -->
+            <div class="card" style="padding: 16px; margin-bottom: 16px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.2rem;">🔊</span>
+                        <div>
+                            <div style="font-size: 0.88rem; font-weight: 700;">MeshPay Soundbox</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">Voice confirmation for offline incoming packets</div>
+                        </div>
+                    </div>
+                    <span class="badge badge-settled">Active</span>
+                </div>
+                <button class="btn btn-secondary" style="padding: 8px; font-size: 0.78rem;" onclick="window.app.announceSoundbox(250, 'Carol Patel')">
+                    Test Soundbox Announcement
+                </button>
+            </div>
+
+            <div style="background: rgba(217, 119, 6, 0.08); border: 1px solid rgba(217, 119, 6, 0.25); border-radius: var(--radius-md); padding: 12px; font-size: 0.74rem; color: var(--text-muted);">
+                ℹ️ <strong>Peer Pairing Notice:</strong> Scanning this QR establishes a direct peer-to-peer BLE connection for exchanging the cryptographic payment envelope. It is NOT an instant banking settlement.
+            </div>
+        </section>
+
+        <!-- ===============================================================
+             Screen F: Transaction History
+             =============================================================== -->
+        <section class="view-screen" id="screen-history">
+            <div style="margin-bottom: 14px;">
+                <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 4px;">Transaction Ledger</h2>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">Search and inspect settled or pending payments</p>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+                <input type="text" id="history-search-input" placeholder="Search by VPA or transaction hash..." 
+                       style="width: 100%; padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); background: var(--surface-card); color: var(--text-primary); font-size: 0.85rem;"
+                       oninput="window.app.renderHistory()">
+            </div>
+
+            <!-- Filter Chips -->
+            <div style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 14px;">
+                <button class="pill-amount-btn filter-chip active" data-filter="ALL" onclick="window.app.setHistoryFilter('ALL', this)">All</button>
+                <button class="pill-amount-btn filter-chip" data-filter="SETTLED" onclick="window.app.setHistoryFilter('SETTLED', this)">Settled</button>
+                <button class="pill-amount-btn filter-chip" data-filter="QUEUED_OFFLINE" onclick="window.app.setHistoryFilter('QUEUED_OFFLINE', this)">Queued Offline</button>
+                <button class="pill-amount-btn filter-chip" data-filter="REJECTED" onclick="window.app.setHistoryFilter('REJECTED', this)">Rejected</button>
+            </div>
+
+            <div id="history-list"></div>
+        </section>
+
+        <!-- ===============================================================
+             Screen G: Sync Centre
+             =============================================================== -->
+        <section class="view-screen" id="screen-sync">
+            <div style="margin-bottom: 14px;">
+                <h2 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 4px;">Synchronisation Centre</h2>
+                <p style="font-size: 0.78rem; color: var(--text-muted);">Manage local offline queue and gateway reconciliation</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                <div class="card" style="padding: 14px; margin-bottom: 0;">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">PENDING IN QUEUE</div>
+                    <div id="sync-pending-count" style="font-size: 1.6rem; font-weight: 800; color: var(--accent-amber); margin-top: 4px;">0</div>
+                </div>
+                <div class="card" style="padding: 14px; margin-bottom: 0;">
+                    <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">NETWORK STATUS</div>
+                    <div id="sync-connection-status" style="font-size: 0.85rem; font-weight: 700; color: var(--brand-primary); margin-top: 8px;">Online</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 18px;">
+                <button class="btn btn-primary" onclick="window.app.triggerManualSync()">
+                    Reconcile & Upload Now
+                </button>
+            </div>
+
+            <div class="section-header">
+                <span class="section-title">Local Queue (IndexedDB)</span>
+            </div>
+
+            <div id="sync-outbox-list"></div>
+        </section>
+
+        <!-- ===============================================================
+             Screen H: Profile & Settings
+             =============================================================== -->
+        <section class="view-screen" id="screen-profile">
+            <div style="text-align: center; padding: 16px 0 20px 0;">
+                <div class="tx-avatar" style="width: 64px; height: 64px; font-size: 1.4rem; background: var(--brand-surface); color: var(--brand-primary); margin: 0 auto 10px auto;">
+                    AS
+                </div>
+                <h2 id="profile-name" style="font-size: 1.15rem; font-weight: 700;">Alice Sharma</h2>
+                <div id="profile-vpa" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">alice@demo</div>
+                <div id="profile-phone" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">+91 98765 43210</div>
+            </div>
+
+            <!-- Offline Allowance Card -->
+            <div class="card" style="margin-bottom: 14px;">
+                <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 8px;">Offline Wallet Parameters</div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                    <span style="color: var(--text-muted);">Max Offline Allowance:</span>
+                    <span id="profile-allowance-cap" style="font-weight: 600;">₹2,000.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+                    <span style="color: var(--text-muted);">Spent Since Last Sync:</span>
+                    <span id="profile-allowance-spent" style="font-weight: 600; color: var(--accent-amber);">₹0.00</span>
+                </div>
+            </div>
+
+            <!-- Security & Device Info -->
+            <div class="card" style="margin-bottom: 14px;">
+                <div style="font-size: 0.85rem; font-weight: 700; margin-bottom: 8px;">Security & Hardware Key</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px;">
+                    Default Demo UPI PIN: <strong style="color: var(--text-primary);">1234</strong>
+                </div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">
+                    Asymmetric Cipher: <strong>RSA-2048-OAEP</strong><br>
+                    Symmetric AEAD: <strong>AES-256-GCM</strong>
+                </div>
+            </div>
+
+            <button class="btn btn-danger" onclick="window.app.openResetModal()">
+                Reset Demo Data & Local Cache
+            </button>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-screen="home" onclick="window.app.navigate('home')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span>Home</span>
+        </button>
+
+        <button class="nav-item" data-screen="pay" onclick="window.app.navigate('pay')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="16"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+            <span>Pay</span>
+        </button>
+
+        <button class="nav-item" data-screen="history" onclick="window.app.navigate('history')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <span>Ledger</span>
+        </button>
+
+        <button class="nav-item" data-screen="sync" onclick="window.app.navigate('sync')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <polyline points="1 4 1 10 7 10"/>
+                <polyline points="23 20 23 14 17 14"/>
+                <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+            </svg>
+            <span>Sync</span>
+            <span class="nav-badge" id="pending-sync-badge" style="display: none;">0</span>
+        </button>
+
+        <button class="nav-item" data-screen="profile" onclick="window.app.navigate('profile')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span>Profile</span>
+        </button>
+    </nav>
+</div>
+
+<!-- ===============================================================
+     PIN Entry Modal Bottom Sheet
+     =============================================================== -->
+<div class="modal-backdrop" id="pin-modal-backdrop">
+    <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div style="text-align: center; margin-bottom: 12px;">
+            <div style="font-size: 1.1rem; font-weight: 800;">Enter 4-Digit UPI PIN</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Demo PIN is <strong>1234</strong></div>
+        </div>
+
+        <div class="pin-dots-row">
+            <div class="pin-dot" id="pin-dot-1"></div>
+            <div class="pin-dot" id="pin-dot-2"></div>
+            <div class="pin-dot" id="pin-dot-3"></div>
+            <div class="pin-dot" id="pin-dot-4"></div>
+        </div>
+
+        <div class="keypad-grid" style="margin-top: 18px;">
+            <button class="key-btn" onclick="window.app.pinKeyInput('1')">1</button>
+            <button class="key-btn" onclick="window.app.pinKeyInput('2')">2</button>
+            <button class="key-btn" onclick="window.app.pinKeyInput('3')">3</button>
+            <button class="key-btn" onclick="window.app.pinKeyInput('4')">4</button>
+            <button class="key-btn" onclick="window.app.pinKeyInput('5')">5</button>
+            <button class="key-btn" onclick="window.app.pinKeyInput('6')">6</button>
+            <button class="key-btn" onclick="window.app.pinKeyInput('7')">7</button>
+            <button class="key-btn" onclick="window.app.pinKeyInput('8')">8</button>
+            <button class="key-btn" onclick="window.app.pinKeyInput('9')">9</button>
+            <button class="key-btn" onclick="window.app.closePinModal()" style="font-size: 0.9rem; color: var(--accent-red);">Cancel</button>
+            <button class="key-btn" onclick="window.app.pinKeyInput('0')">0</button>
+            <button class="key-btn" onclick="window.app.pinKeyInput('backspace')">⌫</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===============================================================
+     Transaction Details Modal Bottom Sheet
+     =============================================================== -->
+<div class="modal-backdrop" id="tx-detail-modal-backdrop">
+    <div class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div id="detail-amount" style="font-size: 1.8rem; font-weight: 800; color: var(--text-primary);">₹0.00</div>
+            <span id="detail-status-badge" class="badge"></span>
+        </div>
+
+        <div class="card" style="padding: 12px; margin-bottom: 14px; font-size: 0.8rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: var(--text-muted);">From:</span>
+                <span id="detail-sender" style="font-weight: 600;"></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: var(--text-muted);">To:</span>
+                <span id="detail-receiver" style="font-weight: 600;"></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: var(--text-muted);">Ledger Tx ID:</span>
+                <span id="detail-tx-id" style="font-weight: 600;"></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: var(--text-muted);">Bridge Node:</span>
+                <span id="detail-bridge" style="font-weight: 600;"></span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span style="color: var(--text-muted);">Hop Count:</span>
+                <span id="detail-hops" style="font-weight: 600;"></span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: var(--text-muted);">Timestamp:</span>
+                <span id="detail-time" style="font-weight: 600;"></span>
+            </div>
+        </div>
+
+        <div style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); word-break: break-all; margin-bottom: 14px;">
+            SHA-256 Idempotency Hash:<br>
+            <span id="detail-packet-hash" style="color: var(--brand-primary);"></span>
+        </div>
+
+        <button class="btn btn-secondary" onclick="window.app.closeTxDetails()">Close</button>
+    </div>
+</div>
+
+<!-- ===============================================================
+     Reset Confirmation Modal
+     =============================================================== -->
+<div class="modal-backdrop" id="reset-modal-backdrop">
+    <div class="bottom-sheet" style="text-align: center;">
+        <div class="sheet-handle"></div>
+        <div style="font-size: 1.15rem; font-weight: 800; color: var(--accent-red); margin-bottom: 8px;">
+            Reset All Demo Data?
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px;">
+            This will wipe the local IndexedDB outbox, clear the server-side mesh simulator state, and restore all 4 demo accounts to starting balances.
+        </p>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" onclick="window.app.closeResetModal()">Cancel</button>
+            <button class="btn btn-danger" onclick="window.app.confirmDemoReset()">Yes, Reset Everything</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/crypto.js"></script>
+<script src="/js/db.js"></script>
+<script src="/js/mesh.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

@@ -16,13 +16,11 @@ import java.time.Instant;
  * Orchestrates the full server-side pipeline for one inbound packet from a
  * bridge node:
  *
- *   1. Hash the ciphertext.
- *   2. Try to claim that hash via the idempotency cache.
- *      - If already claimed: this is a duplicate. Drop it.
- *   3. Decrypt the ciphertext with the server's private key.
- *      - If decryption fails: tampered or junk. Reject.
- *   4. Check freshness — reject if signedAt is too old (replay protection).
- *   5. Hand off to SettlementService for the actual debit/credit.
+ *   1. Hash the ciphertext (SHA-256).
+ *   2. Atomic Idempotency check (drop if already claimed).
+ *   3. Decrypt the ciphertext with server's RSA private key.
+ *   4. Check freshness (replay protection).
+ *   5. Settle ledger atomically via SettlementService.
  */
 @Service
 public class BridgeIngestionService {
@@ -54,6 +52,7 @@ public class BridgeIngestionService {
             } catch (Exception e) {
                 log.warn("Decryption failed for packet {}: {}",
                         packetHash.substring(0, 12) + "...", e.getMessage());
+                idempotency.recordOutcome(packetHash, "INVALID", "decryption_failed");
                 return IngestResult.invalid(packetHash, "decryption_failed");
             }
 
@@ -62,14 +61,19 @@ public class BridgeIngestionService {
             if (ageSeconds > maxAgeSeconds) {
                 log.warn("Packet {} too old ({}s), rejected",
                         packetHash.substring(0, 12) + "...", ageSeconds);
+                idempotency.recordOutcome(packetHash, "INVALID", "stale_packet");
                 return IngestResult.invalid(packetHash, "stale_packet");
             }
             if (ageSeconds < -300) { // small clock-skew tolerance
+                idempotency.recordOutcome(packetHash, "INVALID", "future_dated");
                 return IngestResult.invalid(packetHash, "future_dated");
             }
 
             // ---- Settle ----
             Transaction tx = settlement.settle(instruction, packetHash, bridgeNodeId, hopCount);
+            if (tx.getStatus() == Transaction.Status.REJECTED) {
+                return IngestResult.rejected(packetHash, tx.getFailureReason(), tx.getId());
+            }
             return IngestResult.settled(packetHash, tx);
 
         } catch (Exception e) {
@@ -81,6 +85,9 @@ public class BridgeIngestionService {
     public record IngestResult(String outcome, String packetHash, String reason, Long transactionId) {
         public static IngestResult settled(String hash, Transaction tx) {
             return new IngestResult("SETTLED", hash, null, tx.getId());
+        }
+        public static IngestResult rejected(String hash, String reason, Long txId) {
+            return new IngestResult("REJECTED", hash, reason, txId);
         }
         public static IngestResult duplicate(String hash) {
             return new IngestResult("DUPLICATE_DROPPED", hash, null, null);
