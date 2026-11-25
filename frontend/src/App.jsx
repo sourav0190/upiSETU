@@ -80,6 +80,11 @@ export default function App() {
   const [linkFailureActive, setLinkFailureActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Gossip Hop Progression & Transfer States
+  const [gossipHopIndex, setGossipHopIndex] = useState(0);
+  const [activeTransferLink, setActiveTransferLink] = useState(null); // { from: 'alice', to: 'carol' }
+  const [broadcastNode, setBroadcastNode] = useState(null); // Active BLE radio wave emitter node
+
   // 4G High-Pressure Water Pipe State (Active when packet reaches bridge / ready to upload / flushing)
   const isWaterPipeFlowing =
     currentStep === 3 ||
@@ -329,6 +334,9 @@ export default function App() {
       const data = await res.json();
       setActivePacket(data);
       setCurrentStep(2);
+      setGossipHopIndex(0);
+      setActiveTransferLink(null);
+      setBroadcastNode(null);
       setHighlightedNodes([senderChar.key]);
 
       movePacketTo(startPos.x, startPos.y, true);
@@ -346,76 +354,117 @@ export default function App() {
     }
   };
 
-  // =========================================================================
-  // STEP 2: SPREAD THE GOSSIP
-  // =========================================================================
-  const handleSpreadGossip = async () => {
-    setIsSubmitting(true);
-    playSound('hop');
-    setSimStatus('Propagating gossip packets across local BLE neighborhood...');
-
-    try {
-      const res = await fetch('/api/mesh/gossip', { method: 'POST' });
-      if (!res.ok) throw new Error('Gossip call failed');
-
-      const data = await res.json();
-      addLog(`🗣️ [GOSSIP ROUND] ${data.transfers} packet transfer(s) across mesh. Device counts: ${JSON.stringify(data.deviceCounts)}`, 'info');
-
-      if (linkFailureActive) {
-        // Detour through Bob & Dave
-        triggerBubble('carol', 'Bridge is out of range! Rerouting to Dave! 🔄');
-        setHighlightedNodes(['bob']);
-        movePacketTo(NODE_POSITIONS.bob.x, NODE_POSITIONS.bob.y, true);
-
-        setTimeout(() => {
-          playSound('hop');
-          triggerBubble('dave', 'Dave received packet! Forwarding to Eve Bridge! 🏃‍♂️');
-          setHighlightedNodes(['dave']);
-          movePacketTo(NODE_POSITIONS.dave.x, NODE_POSITIONS.dave.y, true);
-
-          setTimeout(() => {
-            playSound('water_rush');
-            triggerBubble('bridge', 'Eve Bridge got the packet! 4G water pipe OPEN! Flushing to Bank! 🚰🌊');
-            triggerSticker('🌊', 'Water Pipe Flowing!', 'Packet reached Eve Bridge — flushing into Bank reservoir');
-            setHighlightedNodes(['bridge']);
-            movePacketTo(NODE_POSITIONS.bridge.x, NODE_POSITIONS.bridge.y, true);
-            setCurrentStep(3);
-            setSimStatus('Packet reached Eve Bridge (4G Ingress) — Ready to upload to Central Bank');
-          }, 450);
-        }, 450);
-      } else {
-        // Normal Route: Carol -> Bridge
-        const senderShortName = currentSender?.name?.split(' ')[0] || 'Alice';
-        triggerBubble('carol', `Psst! Got ${senderShortName}’s packet! Passing forward! 👀`);
-        setHighlightedNodes(['carol']);
-        movePacketTo(NODE_POSITIONS.carol.x, NODE_POSITIONS.carol.y, true);
-
-        setTimeout(() => {
-          playSound('water_rush');
-          triggerBubble('bridge', 'Eve Bridge got the packet! 4G water pipe OPEN! Flushing to Bank! 🚰🌊');
-          triggerSticker('🌊', 'Water Pipe Flowing!', 'Packet reached Eve Bridge — flushing into Bank reservoir');
-          setHighlightedNodes(['bridge']);
-          movePacketTo(NODE_POSITIONS.bridge.x, NODE_POSITIONS.bridge.y, true);
-          setCurrentStep(3);
-          setSimStatus('Packet reached Eve Bridge (4G Ingress) — Ready to upload to Central Bank');
-        }, 500);
-      }
-
-      await refreshData();
-    } catch (err) {
-      addLog(`Gossip error: ${err.message}`, 'error');
-    } finally {
-      setIsSubmitting(false);
+  // Dynamic Gossip Route based on chosen sender and network link health
+  const getGossipRoute = () => {
+    const senderKey = currentSender?.key || 'alice';
+    if (senderKey === 'bob') {
+      return ['bob', 'dave', 'bridge'];
+    } else if (senderKey === 'carol') {
+      return linkFailureActive ? ['carol', 'dave', 'bridge'] : ['carol', 'bridge'];
+    } else if (senderKey === 'dave') {
+      return ['dave', 'bridge'];
+    } else {
+      // Alice
+      return linkFailureActive ? ['alice', 'bob', 'dave', 'bridge'] : ['alice', 'carol', 'bridge'];
     }
   };
 
-  const handleAutoWhisperToBridge = async () => {
-    addLog('⚡ [AUTO-WHISPER] Stepping packet through simulated mesh to Bridge...', 'info');
+  const isLinkActive = (n1, n2) => {
+    if (!activeTransferLink) return false;
+    return (
+      (activeTransferLink.from === n1 && activeTransferLink.to === n2) ||
+      (activeTransferLink.from === n2 && activeTransferLink.to === n1)
+    );
+  };
+
+  // =========================================================================
+  // STEP 2: SPREAD THE GOSSIP (Step Hop & Auto-Propagate)
+  // =========================================================================
+  const executeSingleHop = async (hopIdx) => {
+    const route = getGossipRoute();
+    if (hopIdx >= route.length - 1) {
+      setCurrentStep(3);
+      setSimStatus('Packet reached Eve Bridge (4G Ingress) — Ready to upload to Central Bank');
+      return true;
+    }
+
+    const src = route[hopIdx];
+    const dst = route[hopIdx + 1];
+    const srcChar = NODE_POSITIONS[src];
+    const dstChar = NODE_POSITIONS[dst];
+    const remainingTtl = Math.max(5 - hopIdx, 1);
+
+    setIsSubmitting(true);
+    setBroadcastNode(src);
+    setActiveTransferLink({ from: src, to: dst });
+    playSound('hop');
+
+    triggerBubble(src, `Broadcasting packet to ${dstChar.name.split(' ')[0]} via BLE... 📡 (TTL: ${remainingTtl})`);
+    setSimStatus(`Gossip hop in-flight: ${srcChar.name} ➔ ${dstChar.name} (BLE 2.4 GHz store-and-forward)`);
+
+    // Smoothly glide packet mascot to destination node
+    movePacketTo(dstChar.x, dstChar.y, true);
+
+    try {
+      const res = await fetch('/api/mesh/gossip', { method: 'POST' });
+      if (res.ok) {
+        const data = await res.json();
+        addLog(`🗣️ [HOP ${hopIdx + 1}] Packet transferred from ${srcChar.deviceId} ➔ ${dstChar.deviceId} (${data.transfers} transfers across mesh)`, 'info');
+      }
+    } catch (e) {
+      console.warn('Gossip API note:', e.message);
+    }
+
+    // Wait for the packet mascot glide transition (850ms)
+    await new Promise((r) => setTimeout(r, 850));
+
+    setHighlightedNodes([dst]);
+    setBroadcastNode(null);
+    setGossipHopIndex(hopIdx + 1);
+
+    if (dst === 'bridge') {
+      playSound('water_rush');
+      triggerBubble('bridge', 'Eve Bridge got the packet! 4G water pipe OPEN! Flushing to Bank! 🚰🌊');
+      triggerSticker('🌊', 'Water Pipe Flowing!', 'Packet reached Eve Bridge — high-pressure water pipe flowing into Bank');
+      setCurrentStep(3);
+      setSimStatus('Packet reached Eve Bridge (4G Ingress) — Ready to upload to Central Bank');
+      await refreshData();
+      setIsSubmitting(false);
+      return true;
+    } else {
+      triggerBubble(dst, `Got packet! Cached in memory (Hops: ${hopIdx + 1}, TTL: ${remainingTtl - 1}) 👀`);
+      triggerSticker('📦', 'Packet Received!', `Hopped from ${srcChar.name.split(' ')[0]} to ${dstChar.name.split(' ')[0]}`);
+      setSimStatus(`Packet securely stored in ${dstChar.name}'s offline outbox (TTL: ${remainingTtl - 1})`);
+      await refreshData();
+      setIsSubmitting(false);
+      return false;
+    }
+  };
+
+  const handleStepGossipHop = async () => {
     if (currentStep === 1 || !activePacket) {
       await handleLaunchPayment();
       await new Promise((r) => setTimeout(r, 600));
     }
-    await handleSpreadGossip();
+    await executeSingleHop(gossipHopIndex);
+  };
+
+  const handleAutoGossip = async () => {
+    addLog('⚡ [AUTO-GOSSIP] Auto-propagating packet through simulated mesh network...', 'info');
+    let currentIdx = gossipHopIndex;
+    if (currentStep === 1 || !activePacket) {
+      await handleLaunchPayment();
+      await new Promise((r) => setTimeout(r, 600));
+      currentIdx = 0;
+    }
+
+    const route = getGossipRoute();
+    while (currentIdx < route.length - 1) {
+      const reachedBridge = await executeSingleHop(currentIdx);
+      currentIdx++;
+      if (reachedBridge) break;
+      await new Promise((r) => setTimeout(r, 450));
+    }
   };
 
   // =========================================================================
@@ -472,6 +521,9 @@ export default function App() {
         const startPos = NODE_POSITIONS[currentSender?.key] || NODE_POSITIONS.alice;
         movePacketTo(startPos.x, startPos.y, false);
         setHighlightedNodes([]);
+        setActiveTransferLink(null);
+        setBroadcastNode(null);
+        setGossipHopIndex(0);
         setCurrentStep(1);
       }, 2000);
 
@@ -495,6 +547,9 @@ export default function App() {
       addLog('🔄 Network state, in-flight packets, and idempotency cache cleared', 'system');
       setActivePacket(null);
       setCurrentStep(1);
+      setGossipHopIndex(0);
+      setActiveTransferLink(null);
+      setBroadcastNode(null);
       setHighlightedNodes([]);
       movePacketTo(NODE_POSITIONS.alice.x, NODE_POSITIONS.alice.y, false);
       setSimStatus('Network Idle. Alice has zero cellular reception in the basement.');
@@ -976,19 +1031,43 @@ export default function App() {
               <g className="links-layer">
                 {/* Alice -> Bob */}
                 <line x1="100" y1="100" x2="250" y2="50" className="topo-conduit-bg" />
-                <line x1="100" y1="100" x2="250" y2="50" className="topo-link" />
+                <line
+                  x1="100"
+                  y1="100"
+                  x2="250"
+                  y2="50"
+                  className={`topo-link ${isLinkActive('alice', 'bob') ? 'topo-link-active-transfer' : ''}`}
+                />
 
                 {/* Alice -> Carol */}
                 <line x1="100" y1="100" x2="250" y2="150" className="topo-conduit-bg" />
-                <line x1="100" y1="100" x2="250" y2="150" className="topo-link active-pulse" />
+                <line
+                  x1="100"
+                  y1="100"
+                  x2="250"
+                  y2="150"
+                  className={`topo-link ${isLinkActive('alice', 'carol') ? 'topo-link-active-transfer' : 'active-pulse'}`}
+                />
 
                 {/* Bob -> Dave */}
                 <line x1="250" y1="50" x2="410" y2="100" className="topo-conduit-bg" />
-                <line x1="250" y1="50" x2="410" y2="100" className="topo-link" />
+                <line
+                  x1="250"
+                  y1="50"
+                  x2="410"
+                  y2="100"
+                  className={`topo-link ${isLinkActive('bob', 'dave') ? 'topo-link-active-transfer' : ''}`}
+                />
 
                 {/* Carol -> Dave */}
                 <line x1="250" y1="150" x2="410" y2="100" className="topo-conduit-bg" />
-                <line x1="250" y1="150" x2="410" y2="100" className="topo-link" />
+                <line
+                  x1="250"
+                  y1="150"
+                  x2="410"
+                  y2="100"
+                  className={`topo-link ${isLinkActive('carol', 'dave') ? 'topo-link-active-transfer' : ''}`}
+                />
 
                 {/* Carol -> Bridge (May be severed in chaos mission) */}
                 <line
@@ -1003,12 +1082,18 @@ export default function App() {
                   y1="150"
                   x2="550"
                   y2="150"
-                  className={`topo-link ${linkFailureActive ? 'topo-link-severed' : 'active-pulse'}`}
+                  className={`topo-link ${linkFailureActive ? 'topo-link-severed' : isLinkActive('carol', 'bridge') ? 'topo-link-active-transfer' : 'active-pulse'}`}
                 />
 
                 {/* Dave -> Bridge */}
                 <line x1="410" y1="100" x2="550" y2="150" className="topo-conduit-bg" />
-                <line x1="410" y1="100" x2="550" y2="150" className="topo-link" />
+                <line
+                  x1="410"
+                  y1="100"
+                  x2="550"
+                  y2="150"
+                  className={`topo-link ${isLinkActive('dave', 'bridge') ? 'topo-link-active-transfer' : ''}`}
+                />
 
                 {/* =========================================================================
                     4G HIGH-PRESSURE WATER PIPE: Eve Bridge (550, 150) -> Central Bank (680, 100)
@@ -1093,18 +1178,33 @@ export default function App() {
                 </g>
               </g>
 
+              {/* Active BLE Broadcast Radio Waves Emitting from Source Node */}
+              {broadcastNode && NODE_POSITIONS[broadcastNode] && (
+                <g transform={`translate(${NODE_POSITIONS[broadcastNode].x}, ${NODE_POSITIONS[broadcastNode].y})`} className="topo-ble-broadcast-group">
+                  <circle r="16" className="topo-ble-broadcast r1" />
+                  <circle r="26" className="topo-ble-broadcast r2" />
+                  <circle r="36" className="topo-ble-broadcast r3" />
+                  <text textAnchor="middle" y="-28" className="broadcast-signal-text">📡 2.4GHz BLE Broadcasting...</text>
+                </g>
+              )}
+
               {/* Animated Living Packet Character */}
               {transitDot.visible && (
                 <g transform={`translate(${transitDot.x}, ${transitDot.y})`} className="packet-mascot-group">
                   {/* Energy Aura */}
-                  <circle r="14" className="packet-aura" />
+                  <circle r="16" className="packet-aura" />
                   {/* Envelope Body */}
-                  <circle r="9" className="packet-capsule" />
-                  <text textAnchor="middle" y="4" fontSize="10">✉️</text>
+                  <circle r="10" className="packet-capsule" />
+                  <text textAnchor="middle" y="4" fontSize="11">✉️</text>
                   {/* Floating Amount Tag */}
-                  <rect x="-18" y="-24" width="36" height="14" rx="4" fill="var(--color-pine)" />
+                  <rect x="-20" y="-25" width="40" height="15" rx="4" fill="var(--color-pine)" stroke="var(--color-oatmeal)" strokeWidth="1" />
                   <text textAnchor="middle" y="-14" fontSize="8.5" fill="var(--color-oatmeal)" fontWeight="bold">
                     ₹{amount}
+                  </text>
+                  {/* Moving Hop/TTL indicator badge */}
+                  <rect x="-24" y="14" width="48" height="13" rx="3" fill="rgba(15, 23, 42, 0.85)" stroke="#38BDF8" strokeWidth="0.8" />
+                  <text textAnchor="middle" y="23" fontSize="7.5" fill="#E0F7FA" fontWeight="bold" fontFamily="var(--font-mono)">
+                    HOP #{gossipHopIndex + 1} ⚡
                   </text>
                 </g>
               )}
@@ -1326,45 +1426,80 @@ export default function App() {
                 <span className="emoji-large">📲</span>
                 <span className="emoji-arrow">⇄</span>
                 <span className="emoji-large">🏃‍♂️</span>
+                <span className="emoji-arrow">➔</span>
+                <span className="emoji-large">🌉</span>
               </div>
 
               <div className="step-header">
                 <span className="step-badge">2</span>
                 <div>
-                  <strong className="step-name">2. Spread the Gossip!</strong>
+                  <strong className="step-name">2. Gossip Protocol Propagation</strong>
                   <div className="step-sub">Phone-to-phone BLE store-and-forward 🗣️</div>
                 </div>
               </div>
 
-              <div className="step-mini-visual">
-                <span>👩 Alice</span>
-                <span className="visual-tx-flow">⚡ Carol ⚡ Dave</span>
-                <span>🌉 Bridge</span>
+              {/* Dynamic Station Route Visualizer */}
+              <div className="gossip-route-visualizer">
+                {getGossipRoute().map((nodeKey, idx) => {
+                  const isPast = idx < gossipHopIndex;
+                  const isCurrent = idx === gossipHopIndex;
+                  const char = NODE_POSITIONS[nodeKey];
+                  return (
+                    <React.Fragment key={nodeKey}>
+                      <div className={`route-station ${isCurrent ? 'station-current' : isPast ? 'station-done' : ''}`}>
+                        <span className="station-avatar">{char.avatar}</span>
+                        <span className="station-name">{char.name.split(' ')[0]}</span>
+                        {isPast && <span className="station-check">✓</span>}
+                        {isCurrent && <span className="station-pulse-dot" />}
+                      </div>
+                      {idx < getGossipRoute().length - 1 && (
+                        <span className={`route-connector ${isPast ? 'connector-done' : isCurrent ? 'connector-active' : ''}`}>
+                          ➔
+                        </span>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+
+              {/* Hop Telemetry Badge */}
+              <div className="hop-telemetry-badge">
+                <span className="telemetry-item">
+                  🏷️ <strong>HOP {Math.min(gossipHopIndex + 1, getGossipRoute().length - 1)}/{getGossipRoute().length - 1}</strong>
+                </span>
+                <span className="telemetry-item">
+                  📡 <strong>BLE 5.2 (2.4 GHz)</strong>
+                </span>
+                <span className="telemetry-item">
+                  ⏳ <strong>TTL: {Math.max(5 - gossipHopIndex, 1)}</strong>
+                </span>
               </div>
 
               <p className="step-desc-text">
-                "Psst! Carol, Alice has a payment for Bob!" Relays forward the sealed capsule without knowing the PIN or balance.
+                "Psst! Carol, Alice has a payment for Bob!" Devices broadcast encrypted capsules to nearby neighbors over 2.4 GHz BLE without knowing the PIN or balance.
               </p>
 
               <div className="step-actions-cluster">
                 <button
                   type="button"
                   className="btn-accent"
-                  onClick={handleSpreadGossip}
+                  onClick={handleStepGossipHop}
                   disabled={isSubmitting}
+                  title="Perform 1 simulation hop across BLE neighbors"
                 >
                   <RefreshCw size={15} className={isSubmitting ? 'icon-spin' : ''} />
-                  <span>🗣️ Spread the Gossip</span>
+                  <span>👣 Step Hop (1 Transfer)</span>
                 </button>
 
                 <button
                   type="button"
                   className="btn-purple"
-                  onClick={handleAutoWhisperToBridge}
+                  onClick={handleAutoGossip}
                   disabled={isSubmitting}
+                  title="Auto-run gossip until packet reaches Eve Bridge"
                 >
                   <FastForward size={15} />
-                  <span>⚡ Auto-Whisper to Bridge</span>
+                  <span>⚡ Auto-Run Mesh Gossip</span>
                 </button>
               </div>
 

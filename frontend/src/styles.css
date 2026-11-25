@@ -3154,3 +3154,167 @@ body {
 .tag-flowing + .pipe-tag-text {
     fill: #E0F7FA;
 }
+
+/* ==========================================================================
+   GOSSIP PACKET TRANSFER & HOP VISUALIZATION
+   ========================================================================== */
+
+/* Smooth sliding packet character across topology canvas */
+.packet-mascot-group {
+    transition: transform 0.85s cubic-bezier(0.25, 1, 0.5, 1);
+    pointer-events: none;
+}
+
+/* Active Link Glow during Gossip Transfer */
+.topo-link-active-transfer {
+    stroke: #00E5FF !important;
+    stroke-width: 4.5 !important;
+    stroke-dasharray: 12 6 !important;
+    animation: activeTransferLinkFlow 0.5s infinite linear !important;
+    filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.95)) !important;
+}
+
+@keyframes activeTransferLinkFlow {
+    from { stroke-dashoffset: 36; }
+    to { stroke-dashoffset: 0; }
+}
+
+/* Radio Wave Broadcast from Transmitting Node */
+.topo-ble-broadcast-group {
+    pointer-events: none;
+}
+
+.topo-ble-broadcast {
+    fill: none;
+    stroke: var(--color-lilac);
+    stroke-width: 2;
+    animation: topoBleWave 1.4s infinite cubic-bezier(0.1, 0.8, 0.3, 1);
+    transform-origin: 0 0;
+}
+
+.topo-ble-broadcast.r1 { animation-delay: 0s; }
+.topo-ble-broadcast.r2 { animation-delay: 0.35s; }
+.topo-ble-broadcast.r3 { animation-delay: 0.7s; }
+
+@keyframes topoBleWave {
+    0% { transform: scale(0.6); opacity: 0.95; }
+    100% { transform: scale(2.4); opacity: 0; }
+}
+
+.broadcast-signal-text {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 700;
+    fill: var(--color-lilac);
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.8));
+    animation: fadeIn 0.3s ease;
+}
+
+/* Gossip Step-by-Step Station Route Visualizer */
+.gossip-route-visualizer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(31, 59, 46, 0.1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+[data-theme="dark"] .gossip-route-visualizer {
+    background: rgba(0, 0, 0, 0.25);
+}
+
+.route-station {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: var(--surface-card);
+    border: 1.5px solid var(--border-subtle);
+    font-size: 0.82rem;
+    font-weight: 600;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.route-station.station-done {
+    border-color: #2EA043;
+    background: rgba(46, 160, 67, 0.12);
+    color: #2EA043;
+}
+
+[data-theme="dark"] .route-station.station-done {
+    color: #56D364;
+    border-color: #2EA043;
+}
+
+.route-station.station-current {
+    border-color: #00E5FF;
+    background: rgba(0, 229, 255, 0.15);
+    color: #00E5FF;
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.4);
+    transform: scale(1.06);
+}
+
+.station-check {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #2EA043;
+}
+
+.station-pulse-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #00E5FF;
+    box-shadow: 0 0 8px #00E5FF;
+    animation: dotPulse 1s infinite alternate ease-in-out;
+}
+
+.route-connector {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.route-connector.connector-done {
+    color: #2EA043;
+    font-weight: 800;
+}
+
+.route-connector.connector-active {
+    color: #00E5FF;
+    font-weight: 800;
+    animation: connectorSurge 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes connectorSurge {
+    0% { transform: translateX(-2px); opacity: 0.6; }
+    100% { transform: translateX(2px); opacity: 1; }
+}
+
+/* Hop Telemetry Badge */
+.hop-telemetry-badge {
+    display: flex;
+    justify-content: space-around;
+    padding: 6px 12px;
+    background: rgba(203, 179, 232, 0.12);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-size: 0.74rem;
+    color: var(--text-main);
+    border: 1px solid rgba(203, 179, 232, 0.25);
+}
+
+.telemetry-item strong {
+    color: var(--color-pine);
+}
+
+[data-theme="dark"] .telemetry-item strong {
+    color: var(--color-oatmeal);
+}
