@@ -46,8 +46,7 @@ class MeshCrypto {
         const plaintextBytes = new TextEncoder().encode(jsonString);
 
         if (!this.serverPublicKey) {
-            // Fallback for simulation when server is unreachable during initial load
-            return this._fallbackEncrypt(jsonString);
+            throw new Error('Server RSA Public Key is not available. Real offline hybrid encryption requires the verified server key.');
         }
 
         // 1. Generate one-time 256-bit AES key
@@ -117,14 +116,6 @@ class MeshCrypto {
             binary += String.fromCharCode(bytes[i]);
         }
         return window.btoa(binary);
-    }
-
-    _fallbackEncrypt(jsonString) {
-        const mockCipher = window.btoa('MESHPAY_SIMULATED_ENVELOPE:' + jsonString);
-        return {
-            ciphertext: mockCipher,
-            packetHash: 'mock_' + Date.now().toString(16)
-        };
     }
 }
 

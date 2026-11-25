@@ -12,8 +12,8 @@ import java.time.Instant;
 public class IdempotencyKey {
 
     @Id
-    @Column(length = 64)
-    private String keyHash; // SHA-256 hex of the ciphertext
+    @Column(length = 128)
+    private String keyHash; // SHA-256 hex of the ciphertext or semantic intent hash
 
     @Column(nullable = false)
     private Instant firstSeenAt;

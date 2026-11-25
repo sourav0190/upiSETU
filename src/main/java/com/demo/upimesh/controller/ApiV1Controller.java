@@ -19,7 +19,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/api/v1")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://localhost:8080", "http://127.0.0.1:8080", "http://localhost:3000"})
 public class ApiV1Controller {
 
     @Autowired private AccountRepository accountRepo;
@@ -61,10 +61,14 @@ public class ApiV1Controller {
 
     @PostMapping("/wallet/topup")
     public ResponseEntity<?> topUpWallet(@RequestBody TopUpRequest req) {
-        Account acc = demoService.getOrCreateAccount(req.vpa, null);
-        if (req.amount != null && req.amount.compareTo(BigDecimal.ZERO) > 0) {
-            acc.setBalance(acc.getBalance().add(req.amount));
+        if (req == null || req.vpa == null || req.vpa.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "VPA is required for wallet top-up"));
         }
+        if (req.amount == null || req.amount.compareTo(BigDecimal.ZERO) <= 0 || req.amount.compareTo(new BigDecimal("5000.00")) > 0) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Top-up amount must be positive and at most ₹5,000.00"));
+        }
+        Account acc = demoService.getOrCreateAccount(req.vpa, null);
+        acc.setBalance(acc.getBalance().add(req.amount));
         if (req.resetAllowance) {
             acc.setOfflineAllowanceSpentPaise(0L);
         }

@@ -19,6 +19,9 @@ import java.time.Instant;
                 @Index(name = "idx_tx_sender", columnList = "senderVpa"),
                 @Index(name = "idx_tx_receiver", columnList = "receiverVpa"),
                 @Index(name = "idx_tx_settled_at", columnList = "settledAt")
+        },
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_sender_txref", columnNames = {"senderVpa", "transactionRef"})
         })
 public class Transaction {
 

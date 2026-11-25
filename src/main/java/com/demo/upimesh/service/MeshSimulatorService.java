@@ -19,9 +19,43 @@ public class MeshSimulatorService {
     private static final Logger log = LoggerFactory.getLogger(MeshSimulatorService.class);
 
     private final Map<String, VirtualDevice> devices = new ConcurrentHashMap<>();
+    private final Map<String, Set<String>> topologyLinks = new ConcurrentHashMap<>();
 
     public MeshSimulatorService() {
         seedDefaultDevices();
+        initTopologyLinks();
+    }
+
+    public void initTopologyLinks() {
+        topologyLinks.clear();
+        addLink("phone-alice", "phone-carol");
+        addLink("phone-alice", "phone-bob");
+        addLink("phone-bob", "phone-carol");
+        addLink("phone-carol", "phone-dave");
+        addLink("phone-dave", "phone-bridge");
+        addLink("phone-dave", "phone-bob");
+
+        // Stranger aliases for test compatibility
+        addLink("phone-stranger1", "phone-stranger2");
+        addLink("phone-stranger2", "phone-stranger3");
+    }
+
+    public void addLink(String dev1, String dev2) {
+        topologyLinks.computeIfAbsent(dev1, k -> ConcurrentHashMap.newKeySet()).add(dev2);
+        topologyLinks.computeIfAbsent(dev2, k -> ConcurrentHashMap.newKeySet()).add(dev1);
+    }
+
+    public void removeLink(String dev1, String dev2) {
+        if (topologyLinks.containsKey(dev1)) topologyLinks.get(dev1).remove(dev2);
+        if (topologyLinks.containsKey(dev2)) topologyLinks.get(dev2).remove(dev1);
+    }
+
+    public boolean areNeighbors(String dev1, String dev2) {
+        if (dev1 == null || dev2 == null || dev1.equals(dev2)) return false;
+        Set<String> neighbors = topologyLinks.get(dev1);
+        if (neighbors != null && neighbors.contains(dev2)) return true;
+        // If neither node has defined link constraints (custom ad-hoc nodes), allow peer discovery
+        return !topologyLinks.containsKey(dev1) && !topologyLinks.containsKey(dev2);
     }
 
     public void seedDefaultDevices() {
@@ -120,6 +154,10 @@ public class MeshSimulatorService {
                 if (pkt.getTtl() <= 0) continue;
                 for (VirtualDevice dst : deviceList) {
                     if (dst == src) continue;
+                    // Topology link hop boundary (RFC 4838 Delay-Tolerant physical link proximity)
+                    if (topologyLinks.containsKey(src.getDeviceId()) && !areNeighbors(src.getDeviceId(), dst.getDeviceId())) {
+                        continue;
+                    }
                     if (dst.holds(pkt.getPacketId())) continue;
 
                     MeshPacket copy = new MeshPacket();

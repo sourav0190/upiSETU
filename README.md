@@ -1,33 +1,95 @@
-# 📡 MeshPay — Secure Offline UPI & Dynamic Mesh Architecture
-> **Store-and-Forward Peer-to-Peer Fintech Prototype with Hybrid Cryptography (RSA-2048-OAEP + AES-256-GCM), Dynamic QR Code Vouchers, Soundbox Audio & Variable N-Node Mesh Routing**
+# 📡 MeshPay (upiSETU) — Secure Offline UPI & Delay-Tolerant Mesh Architecture
+
+> **An offline-first peer-to-peer digital payment prototype utilizing Web Crypto hybrid encryption (RSA-2048-OAEP + AES-256-GCM), store-carry-forward delay-tolerant routing (RFC 4838), dual-tier idempotency deduplication, dynamic optical QR vouchers, merchant voice Soundbox, and an interactive 6-part cybersecurity research laboratory.**
 
 [![Build & Test](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 [![Java 21 LTS](https://img.shields.io/badge/Java-21%20LTS-orange.svg)]()
 [![Spring Boot 3.3.5](https://img.shields.io/badge/Spring%20Boot-3.3.5-brightgreen.svg)]()
-[![Cryptography](https://img.shields.io/badge/Cryptography-AES--256--GCM%20%2B%20RSA--2048%20%2B%20SHA--256-blue.svg)]()
-[![QR Engine](https://img.shields.io/badge/QR%20Transport-Dynamic%20Offline%20Voucher-emerald.svg)]()
+[![Cryptography](https://img.shields.io/badge/Cryptography-AES--256--GCM%20%2B%20RSA--2048--OAEP-blue.svg)]()
+[![Tests](https://img.shields.io/badge/Tests-23%2F23%20Passing-brightgreen.svg)]()
+[![Persistence](https://img.shields.io/badge/Database-File--based%20H2%20ACID-success.svg)]()
+[![Viva Guide](https://img.shields.io/badge/Documentation-Comprehensive%20Viva%20Guide-purple.svg)](VIVA_GUIDE.md)
 
 ---
 
-## 🌟 Overview & Product Vision
+## 📜 Academic Attribution & Open-Source Foundation
 
-**MeshPay** is a resilient, offline-first digital payment prototype inspired by Google Pay, PhonePe, and NPCI's UPI Lite X guidelines.
-
-In real-world environments—such as crowded stadiums, underground metro stations, basements, highway tunnels, rural dead-zones, or natural disaster infrastructure blackouts—active cellular (4G/5G) and Wi-Fi internet connectivity frequently drops. Standard UPI fails in these conditions because its star topology requires simultaneous internet sockets on both payer and payee devices.
-
-MeshPay solves this using a **Store-and-Forward Delay-Tolerant Network (DTN - RFC 4838)**:
-1. **Offline Payer Phone:** Signs an authenticated payment instruction and encapsulates it into a zero-trust envelope using **Web Crypto Hybrid Encryption (AES-256-GCM + Central Bank RSA-2048-OAEP)**.
-2. **Optical / BLE Transport:** Can be broadcasted via peer-to-peer radio or rendered as a high-density **Offline Signed QR Code Voucher** that nearby merchants or peers can scan directly without radio.
-3. **Variable N-Node Relay Mesh:** Encrypted packets hop from phone to phone (whether 2, 5, 10, or $N$ participating devices). Intermediate peers (even those with ZERO internet) store and forward packets without ever being able to decrypt amounts, PINs, or balances.
-4. **Opportunistic Bridge Nodes:** When ANY device in the crowd connects to 4G/Wi-Fi, it automatically uploads collected packets to the Central Bank backend.
-5. **Central Backend Ledger:** Computes `SHA-256(ciphertext)` to atomically deduplicate redundant deliveries (solving the *Duplicate Storm* problem), decrypts the instruction, verifies PIN authenticity and account solvency, and atomically settles the ledger using `@Transactional` and Hibernate `@Version` optimistic locking.
-6. **Merchant Soundbox:** Payee device triggers instant audio voice announcements using the Web Speech API (e.g., *"MeshPay received ₹100 from Alice Sharma"*).
+> [!IMPORTANT]
+> **Open-Source Attribution:** MeshPay (upiSETU) is built upon the open-source conceptual project:  
+> 🔗 **Repository:** [https://github.com/perryvegehan/UPI_Without_Internet](https://github.com/perryvegehan/UPI_Without_Internet)  
+> **Original Concept:** Offline UPI instruction transmission using mock packets and simple encryption.  
+>
+> **Major Engineering Enhancements in upiSETU:**
+> 1. Standard Web Crypto **RSA-2048-OAEP + AES-256-GCM** hybrid encryption with 128-bit authentication tags.
+> 2. **Zero Plaintext PIN Storage:** Immediate client-side SHA-256 hashing; zero credentials stored in IndexedDB, network, or logs.
+> 3. **Dual-Tier Idempotency Defense:** Wire-level SHA-256 ciphertext hash filter + relational database semantic `(senderVpa, nonce)` uniqueness constraint.
+> 4. **Persistent Key Management:** Server RSA keypair persisted to disk (`./data/keys/`), surviving reboots.
+> 5. **ACID Relational Persistence:** File-based H2 database (`./data/db/upimesh`) with optimistic locking (`@Version`).
+> 6. **Four Specialized Workspaces:** Payments, Network Topology, Verified Audit Ledger, and Advanced Research Lab.
+> 7. **6-Part Cybersecurity & DTN Lab:** Live automated simulations verifying defense against replay, tampering, and link failures.
+> 8. **23/23 Automated Test Suite:** Exhaustive integration and concurrency tests covering the complete payment lifecycle.
 
 ---
 
-## 👥 Real-Time Multi-Device Demonstration (Variable $N$ Nodes)
+> [!NOTE]
+> **Prototype & Simulator Disclosure:** MeshPay is an educational engineering prototype and architectural simulation of offline-first UPI payment routing over Delay-Tolerant Networks (RFC 4838). It does not connect to the live NPCI production switch or commercial bank core banking systems. All balances, accounts, and cryptographic tokens operate within this self-contained prototype environment.
 
-The mesh network supports **any variable number ($N$) of participating devices**—from a 2-person direct transfer up to a crowd of $N$ phones:
+---
+
+## 🎨 Identity & Organic Design System
+
+MeshPay features a custom editorial, fintech-meets-networking design language created specifically to avoid generic dashboard templates:
+
+| Color Token | Hex Code | Role |
+|---|---|---|
+| **Oatmeal** | `#E8DCC6` | Secondary accents, subtle container backgrounds, light chip borders |
+| **Pine Green** | `#1F3B2E` | Primary brand identity, dark headers, active navigation pills, primary CTA |
+| **Soft Lilac** | `#CBB3E8` | Dynamic transit particle, highlight badges, modal accents |
+| **Warm Background** | `#F5F1E8` | Page background, calm organic surface |
+| **Main Text** | `#243229` | High-contrast readable editorial typography |
+| **Secondary Text** | `#6B746D` | Subtitles, helper text, and technical labels |
+| **Surface Card** | `#FFFFFF` | Elevated white card and modal containers |
+| **Border Tone** | `#D8D1C4` | Subtle borders and structural dividing lines |
+
+---
+
+## 🏛️ Four Modular Workspaces
+
+Rather than cramming unrelated controls onto a single page, MeshPay organizes functionality into **four dedicated workspaces**:
+
+### 1. Payments Workspace (`#workspace-payments`)
+- **Verified Balance Card:** Live core ledger balance with visibility privacy toggle.
+- **UPI-Lite Allowance Gauge:** Enforces the RBI ₹2,000 cumulative offline cap and ₹500 per-transaction ceiling.
+- **Recipient Chips Grid:** Live peer selector indicating distance (meters) and signal strength (dBm).
+- **Amount & Note Inputs:** Quick preset buttons (₹50, ₹100, ₹200, ₹500) and transaction description.
+- **Interactive PIN Keypad Modal:** Client-side 4-digit PIN entry with bubble indicators, immediately hashed with SHA-256.
+- **Merchant Soundbox:** Payee voice alerts powered by the Web Speech API (*"MeshPay received ₹100 from Alice Sharma"*).
+- **Optical Voucher Hub:** Generate and scan offline signed SVG QR vouchers with live camera video decoding.
+
+### 2. Network & Mesh Simulation Workspace (`#workspace-network`)
+- **Interactive SVG Topology Canvas:** Visualizes live physical nodes (Alice, Bob, Carol, Dave, Eve Bridge, Central Bank).
+- **Animated Transit Particle:** Watch packets traverse the mesh node-by-node in real time.
+- **Simulation Step Controls:** Step single hop, Auto Run, and Flush Bridge to Bank.
+- **Dynamic Link Failure Toggle:** Sever the Carol ↔ Bridge primary link to observe automatic gossip rerouting via Dave.
+- **Variable $N$-Node Cluster Roster:** Dynamically register custom devices with custom roles (SENDER, MERCHANT, RELAY, BRIDGE) and cellular switches.
+
+### 3. Transactions & Verified Ledger Workspace (`#workspace-transactions`)
+- **Central Bank Settlement Journal:** Comprehensive table showing Tx ID, Sender, Recipient, Amount, Signed At, Bridge Node, Hop Count, and Settlement Status.
+- **Instant Search & Filter:** Filter transactions in real time by VPA, nonce, or packet hash.
+- **Cryptographic Audit Drawer:** Click **Inspect** on any transaction to view its transaction reference, SHA-256 ciphertext hash, bridge ingress identifier, hop count, and complete state machine event progression.
+
+### 4. Advanced Engineering Laboratory (`#workspace-lab`)
+Six structured experiments designed for university project viva voce and technical defense:
+1. **Experiment 1 (Core Routing):** End-to-End Store-Carry-Forward Delivery (RFC 4838).
+2. **Experiment 2 (Resilience):** Network Interruption & Outbox Buffering during 4G cellular drops.
+3. **Experiment 3 (Duplicate Storm):** Wire-level ciphertext replay rejected by SHA-256 idempotency cache.
+4. **Experiment 4 (Integrity):** Bit-flip tampering rejected by AES-256-GCM 128-bit authentication tag.
+5. **Experiment 5 (Semantic Defense):** Re-encryption replay with fresh AES IV caught by relational `(senderVpa, nonce)` constraint.
+6. **Experiment 6 (Mesh Adaptation):** Dynamic multi-hop rerouting around severed topology links.
+
+---
+
+## 👥 Multi-Device Demonstration (Variable $N$ Nodes)
 
 ```
 [ Person 1: Alice (Sender) ]
@@ -54,62 +116,66 @@ The mesh network supports **any variable number ($N$) of participating devices**
                                      ▼  (HTTPS POST /api/v1/sync)
                       [ Central Bank Backend / NPCI Core Ledger ]
                          1. SHA-256 Hash Deduplication Gate
-                         2. RSA-2048 Private Key Decryption
-                         3. Freshness & Nonce Replay Check
-                         4. Atomic Ledger Settlement
-                         5. Soundbox Voice Alert Broadcast
+                         2. Semantic Nonce Intent Verification
+                         3. RSA-2048 Private Key Decryption
+                         4. Freshness Window & TTL Verification
+                         5. Solvency, PIN & Business Rule Validation
+                         6. Atomic ACID Ledger Settlement
+                         7. Soundbox Voice Alert Broadcast
 ```
 
-### How to Run on Real Mobile Phones:
-1. Connect your laptop and phones to the same Wi-Fi router or Phone Mobile Hotspot.
-2. Find your laptop's local IP address (e.g. `192.168.1.5` via `ipconfig`).
-3. Open `http://192.168.1.5:8080/` on each phone's browser.
-4. Each phone selects or registers their name and toggles **"Online (4G)"** vs **"Offline (Mesh)"** to participate live in the mesh!
+### Running on Real Mobile Devices Over Local Wi-Fi:
+1. Connect your computer and smartphones to the same local Wi-Fi router or phone mobile hotspot.
+2. Find your laptop's IP address (e.g., `192.168.1.45` via `ipconfig` or `ifconfig`).
+3. Open `http://192.168.1.45:8080/` on each phone's browser.
+4. On Phone 1 (Alice), toggle status to **Offline (Mesh)** and initiate a payment.
+5. On Phone 2 (Eve), toggle status to **Online (4G)** to act as the bridge and flush packets to the ledger!
 
 ---
 
-## 🛡️ Interactive Cybersecurity Lab
+## ⚡ Quick Start & Execution
 
-MeshPay includes a dedicated, live interactive attack & defense suite:
+### Prerequisites:
+- Java 21 LTS installed (`java -version`)
+- Maven 3.8+ installed (`mvn -version`)
 
-1. **Replay Attack Defense:** Attempts to replay an already-settled packet. The Central Bank's SHA-256 idempotency filter detects the duplicate hash and rejects it with `DUPLICATE_DROPPED` and zero balance alteration.
-2. **Bit-Flip Tamper Attack:** An attacker flips 1 single bit in the AES-GCM ciphertext in an attempt to modify the transfer amount. AES-GCM authenticated encryption immediately detects the tag mismatch and rejects the envelope with `TAMPER_DETECTED: INVALID`.
-3. **Zero-Knowledge Relay Inspection:** Proves that intermediate nodes (Carol/Dave) who forward packets see strictly randomized Base64 ciphertext: amounts, PINs, and balances are 100% hidden.
-4. **Double-Spend Allowance Blocker:** Enforces RBI's UPI-Lite ₹2,000 offline cap at the device enclave level to prevent un-reconciled overspending.
-
----
-
-## 📷 Dynamic QR Code Engine
-
-MeshPay includes a 100% standalone, zero-dependency pure JavaScript QR engine (`qr.js`):
-- **Merchant Dynamic UPI QR:** Generates `upi://pay?pa=...` with requested amount for instant scanning.
-- **Offline Signed Voucher QR:** Encodes the full encrypted cryptographic envelope (`meshpay://voucher?data=...`) into a scannable optical QR code for true air-gapped data transfer without radio.
-- **Built-in QR Scanner:** Decodes payloads via camera stream, file input, or direct paste.
-
----
-
-## ⚡ Quick Start
-
-### 1. Build & Run Application
+### 1. Run Complete Automated Test Suite (23 Tests)
 ```powershell
-mvn clean compile
-mvn spring-boot:run
+mvn test -o
 ```
-*(Or run the pre-built jar directly: `java -jar target\upi-offline-mesh-0.0.1-SNAPSHOT.jar`)*
+*All 23 unit, integration, cryptographic, concurrency, and security tests execute in ~14 seconds.*
 
-### 2. Access the Application
-- **Main FinTech Workbench & Topology Visualizer:**  
-  👉 **[http://localhost:8080/](http://localhost:8080/)**
-- **5-Device Split-Screen Studio View:**  
-  Click **[👥 Studio Mode]** in the header to view 5 phone screens side-by-side for live college presentations.
-- **H2 Database Console:**  
-  👉 **[http://localhost:8080/h2-console](http://localhost:8080/h2-console)** *(JDBC URL: `jdbc:h2:mem:upimesh`, User: `sa`, Password: empty)*
+### 2. Package the Application
+```powershell
+mvn package -DskipTests -o
+```
+
+### 3. Run the Server
+```powershell
+java -jar target\upi-offline-mesh-0.0.1-SNAPSHOT.jar
+```
+*(Or via Maven: `mvn spring-boot:run`)*
+
+### 4. Access the Workbench
+- **Modern Application UI:** [http://localhost:8080/](http://localhost:8080/)
+- **Upstream Classic Developer View:** [http://localhost:8080/classic](http://localhost:8080/classic)
+- **H2 Database Console:** [http://localhost:8080/h2-console](http://localhost:8080/h2-console)  
+  *(JDBC URL: `jdbc:h2:file:./data/db/upimesh`, Username: `sa`, Password: empty)*
 
 ---
 
-## 💡 Key Viva Concepts (In 60 Seconds)
+## 📚 Viva Voce & Technical Defense Preparation
 
-1. **Why not standard UPI?** Standard UPI requires active internet sockets connecting both devices to NPCI. MeshPay routes deferred authenticated payment instructions over peer-to-peer radio or optical QR codes without internet.
-2. **The Duplicate Storm:** When multiple bridge nodes walk into 4G signal with the same packet, the bank computes `SHA-256(ciphertext)` before decryption. Exactly one thread claims the hash atomically; the other copies are dropped immediately.
-3. **Why Hybrid Encryption?** RSA-2048 cannot encrypt payloads larger than ~214 bytes. AES-256 is fast and supports arbitrary sizes. We generate a fresh AES key per transaction, encrypt the JSON payload with AES-GCM, and encrypt only the AES key with RSA-OAEP.
-4. **How do non-senders forward safely?** Intermediate nodes act as untrusted forwarders (DTN RFC 4838). Because the payload is encrypted with the Bank's public key, intermediaries cannot inspect amounts or PINs, nor can they tamper with the ciphertext without invalidating the AES-GCM authentication tag.
+For students presenting this project to external examiners, consult our comprehensive companion guide:
+📖 **[VIVA_GUIDE.md](VIVA_GUIDE.md)**
+
+It includes:
+- **2-Minute Elevator Pitch** for external examiners.
+- **5-Minute Live Demo Script** with minute-by-minute actions and talking points.
+- **30 Deep Technical Questions & Authoritative Answers** covering RSA-OAEP, AES-GCM, DTN RFC 4838, BLE MTU fragmentation, dual-tier idempotency, and RBI UPI-Lite regulations.
+- **Full Attribution & Architecture Comparison Matrix**.
+
+---
+
+## 📄 License
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details. Built upon the open-source foundation of [perryvegehan/UPI_Without_Internet](https://github.com/perryvegehan/UPI_Without_Internet).

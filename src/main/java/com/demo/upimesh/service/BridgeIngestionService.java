@@ -36,12 +36,21 @@ public class BridgeIngestionService {
 
     public IngestResult ingest(MeshPacket packet, String bridgeNodeId, int hopCount) {
         try {
+            if (packet == null || packet.getCiphertext() == null || packet.getCiphertext().isBlank()) {
+                return IngestResult.invalid("?", "empty_packet");
+            }
+
+            // Packet TTL check
+            if (packet.getTtl() <= 0 || packet.getTtl() > 10) {
+                return IngestResult.invalid("?", "invalid_ttl");
+            }
+
             String packetHash = crypto.hashCiphertext(packet.getCiphertext());
 
             // ---- Idempotency gate ----
             if (!idempotency.claim(packetHash)) {
                 log.info("DUPLICATE packet {} from bridge {} — dropped",
-                        packetHash.substring(0, 12) + "...", bridgeNodeId);
+                        packetHash.substring(0, Math.min(12, packetHash.length())) + "...", bridgeNodeId);
                 return IngestResult.duplicate(packetHash);
             }
 
@@ -51,16 +60,43 @@ public class BridgeIngestionService {
                 instruction = crypto.decrypt(packet.getCiphertext());
             } catch (Exception e) {
                 log.warn("Decryption failed for packet {}: {}",
-                        packetHash.substring(0, 12) + "...", e.getMessage());
+                        packetHash.substring(0, Math.min(12, packetHash.length())) + "...", e.getMessage());
                 idempotency.recordOutcome(packetHash, "INVALID", "decryption_failed");
                 return IngestResult.invalid(packetHash, "decryption_failed");
             }
 
+            if (instruction == null) {
+                idempotency.recordOutcome(packetHash, "INVALID", "null_instruction");
+                return IngestResult.invalid(packetHash, "null_instruction");
+            }
+
+            // ---- Structural validation ----
+            var validationErrors = instruction.validate();
+            if (!validationErrors.isEmpty()) {
+                String firstError = validationErrors.get(0);
+                log.warn("Instruction validation failed for packet {}: {}",
+                        packetHash.substring(0, Math.min(12, packetHash.length())) + "...", validationErrors);
+                idempotency.recordOutcome(packetHash, "INVALID", firstError);
+                return IngestResult.invalid(packetHash, firstError);
+            }
+
+            // ---- Semantic Deduplication Gate ----
+            if (!idempotency.claimSemantic(instruction.getSenderVpa(), instruction.getNonce())) {
+                log.info("SEMANTIC DUPLICATE instruction from sender {} nonce {} — dropped",
+                        instruction.getSenderVpa(), instruction.getNonce());
+                return IngestResult.duplicate(packetHash);
+            }
+
             // ---- Freshness check (replay protection) ----
+            if (instruction.getSignedAt() == null) {
+                idempotency.recordOutcome(packetHash, "INVALID", "missing_timestamp");
+                return IngestResult.invalid(packetHash, "missing_timestamp");
+            }
+
             long ageSeconds = (Instant.now().toEpochMilli() - instruction.getSignedAt()) / 1000;
             if (ageSeconds > maxAgeSeconds) {
                 log.warn("Packet {} too old ({}s), rejected",
-                        packetHash.substring(0, 12) + "...", ageSeconds);
+                        packetHash.substring(0, Math.min(12, packetHash.length())) + "...", ageSeconds);
                 idempotency.recordOutcome(packetHash, "INVALID", "stale_packet");
                 return IngestResult.invalid(packetHash, "stale_packet");
             }

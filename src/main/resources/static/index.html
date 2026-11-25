@@ -1,122 +1,111 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>MeshPay — Secure Offline UPI, Mesh Routing & Cryptographic Architecture</title>
+    <title>MeshPay (upiSETU) — Offline UPI & Delay-Tolerant Mesh Protocol</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 
-<!-- Global Toast Notification Portal -->
-<div class="toast-portal-rack" id="toast-container" aria-live="polite"></div>
+<!-- Toast Notification Portal -->
+<div class="toast-rack" id="toast-container" aria-live="polite"></div>
 
-<!-- Unified Panoramic Shell -->
+<!-- Main Application Shell -->
 <div class="app-container">
 
-    <!-- Panoramic Command Header -->
+    <!-- Global Editorial Command Header -->
     <header class="app-header">
         <!-- Brand Identity -->
-        <div class="brand-wrapper" title="MeshPay: Decentralized Offline UPI Protocol">
-            <div class="brand-logo-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+        <div class="brand-wrapper" onclick="window.app.switchWorkspace('payments')">
+            <div class="brand-badge" title="MeshPay (upiSETU)">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
                 </svg>
             </div>
-            <div class="brand-text-block">
-                <span class="brand-name">MeshPay</span>
-                <span class="brand-tagline">Offline UPI & Mesh Engine</span>
+            <div class="brand-title-group">
+                <div class="brand-name">
+                    MeshPay
+                    <span class="brand-subcode">upiSETU</span>
+                </div>
+                <span class="brand-tagline">Offline UPI & Store-and-Forward Mesh Prototype</span>
             </div>
         </div>
 
-        <!-- Simulation Command Bar -->
-        <div class="sim-command-bar" role="toolbar" aria-label="Mesh Simulation Controls">
-            <button class="sim-btn primary" id="btn-sim-autorun" onclick="window.app.toggleAutoRun()" title="Automatically step packets through gossip mesh">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="5 3 19 12 5 21 5 3"/>
+        <!-- 4-Workspace Navigation -->
+        <nav class="workspace-nav-bar" role="tablist" aria-label="Main Workspaces">
+            <button class="nav-workspace-tab active" id="tab-nav-payments" onclick="window.app.switchWorkspace('payments')">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="5" width="20" height="14" rx="2"/>
+                    <line x1="2" y1="10" x2="22" y2="10"/>
                 </svg>
-                <span id="btn-autorun-label">Auto Run</span>
+                <span>Payments</span>
             </button>
-            <button class="sim-btn" id="btn-sim-step" onclick="window.app.stepSimulationHop()" title="Step a single gossip hop across BLE neighbors">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="9 18 15 12 9 6"/>
+            <button class="nav-workspace-tab" id="tab-nav-network" onclick="window.app.switchWorkspace('network')">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3"/>
+                    <circle cx="6" cy="12" r="3"/>
+                    <circle cx="18" cy="19" r="3"/>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
                 </svg>
-                <span>Step Hop</span>
+                <span>Network</span>
             </button>
-            <button class="sim-btn" id="btn-sim-sync" onclick="window.app.syncMeshToBank()" title="Deliver packets from 4G bridge to central bank ledger">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
+            <button class="nav-workspace-tab" id="tab-nav-transactions" onclick="window.app.switchWorkspace('transactions')">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
                 </svg>
-                <span>Sync Bridges</span>
+                <span>Transactions</span>
             </button>
-            <button class="sim-btn info" id="btn-open-qr-scanner" onclick="window.app.openScannerModal()" title="Scan or decode an offline QR payment voucher">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"/>
-                    <rect x="14" y="3" width="7" height="7"/>
-                    <rect x="3" y="14" width="7" height="7"/>
-                    <rect x="14" y="14" width="7" height="7"/>
+            <button class="nav-workspace-tab" id="tab-nav-lab" onclick="window.app.switchWorkspace('lab')">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 2v7.31L4.69 18.5A2 2 0 0 0 6.4 21.5h11.2a2 2 0 0 0 1.71-3L14 9.31V2"/>
+                    <path d="M8.5 2h7"/>
                 </svg>
-                <span>📷 QR Hub</span>
+                <span>Advanced Lab</span>
             </button>
-            <button class="sim-btn warning" id="btn-sim-duplicate" onclick="window.app.injectDuplicatePacket()" title="Demonstrate Idempotency Gate by replaying a packet">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="1 4 1 10 7 10"/>
-                    <polyline points="23 20 23 14 17 14"/>
-                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
-                </svg>
-                <span>🛡️ Cyber Lab</span>
-            </button>
-            <button class="sim-btn" id="btn-studio-toggle" onclick="window.app.toggleStudioView()" title="Open multi-phone split-screen showcase view">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="3" width="20" height="18" rx="2"/>
-                    <line x1="12" y1="3" x2="12" y2="21"/>
-                </svg>
-                <span>👥 Studio Mode</span>
-            </button>
-            <button class="sim-btn danger" id="btn-sim-fail-link" onclick="window.app.toggleLinkFailure()" title="Simulate BLE interference or physical node out-of-range">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                </svg>
-                <span id="label-link-toggle">⚡ Break Link</span>
-            </button>
-            <button class="sim-btn" id="btn-sim-reset" onclick="window.app.openResetModal()" title="Reset all mesh queues and account ledger balances">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 2v6h6"/>
-                    <path d="M3 13a9 9 0 1 0 3-7.7L3 8"/>
-                </svg>
-                <span>Reset</span>
-            </button>
-        </div>
+        </nav>
 
-        <!-- Header Controls & Device Identity -->
+        <!-- Right Header Actions -->
         <div class="header-actions">
-            <!-- Simulated Network Connectivity Pill -->
-            <button class="network-status-badge offline" id="network-status-pill" onclick="window.app.toggleConnectivityMode()" title="Click to toggle simulated Online 4G vs Offline Basement mode">
-                <span class="pulse-indicator"></span>
+            <!-- Connectivity Toggle -->
+            <button class="network-pill offline" id="network-status-pill" onclick="window.app.toggleConnectivityMode()" title="Toggle simulated 4G vs Offline Basement mode">
+                <span class="pulse-dot"></span>
                 <span id="network-status-text">Offline (Mesh)</span>
             </button>
 
-            <!-- Active User Profile Switcher -->
-            <select id="user-profile-select" class="user-select-dropdown" title="Switch active account on this device" onchange="window.app.switchUser(this.value)">
-                <option value="alice">👩 Alice Sharma (Sender - Offline)</option>
-                <option value="bob">👨 Bob Verma (Merchant - Offline)</option>
-                <option value="carol">👩 Carol Patel (Peer - Relay)</option>
-                <option value="dave">👨 Dave Singh (Peer - Relay)</option>
-                <option value="bridge">🌐 Eve (4G Bridge Ingress)</option>
+            <!-- User Switcher -->
+            <select id="user-profile-select" class="user-select-dropdown" onchange="window.app.switchUser(this.value)" title="Switch active participant">
+                <option value="alice">Alice Sharma (Sender)</option>
+                <option value="bob">Bob Verma (Merchant)</option>
+                <option value="carol">Carol Patel (Relay)</option>
+                <option value="dave">Dave Singh (Relay)</option>
+                <option value="bridge">Eve (4G Bridge)</option>
             </select>
 
-            <button class="sim-btn" onclick="window.app.openAddDeviceModal()" title="Register custom phone or node to mesh" style="padding: 6px 10px; font-size: 0.72rem;">
-                + Add Phone
+            <!-- Classic Original View Link -->
+            <a href="/classic" class="icon-button" title="Switch to Upstream Classic Developer View (/classic)" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; font-family:var(--font-mono); padding:0 8px; width:auto; border-radius:var(--radius-sm); color:var(--text-primary);">
+                Classic Console
+            </a>
+
+            <!-- About / Attribution Modal Trigger -->
+            <button class="icon-button" onclick="window.app.openAboutModal()" title="Project Info & Attribution" aria-label="About">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
             </button>
 
-            <!-- Light/Dark Mode Switcher -->
-            <button class="icon-button" id="theme-toggle-btn" onclick="window.app.toggleTheme()" title="Toggle Light / Dark mode" aria-label="Toggle Theme">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Theme Toggle -->
+            <button class="icon-button" onclick="window.app.toggleTheme()" title="Toggle Warm / Dark Theme" aria-label="Theme">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="12" r="5"/>
                     <line x1="12" y1="1" x2="12" y2="3"/>
                     <line x1="12" y1="21" x2="12" y2="23"/>
@@ -124,116 +113,103 @@
                     <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
                     <line x1="1" y1="12" x2="3" y2="12"/>
                     <line x1="21" y1="12" x2="23" y2="12"/>
-                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
-                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
                 </svg>
             </button>
         </div>
     </header>
 
-    <!-- Main Panoramic Workspace Grid -->
-    <main class="unified-workbench-grid">
+    <!-- =======================================================================
+         WORKSPACE 1 — PAYMENTS (Primary User Experience)
+         ======================================================================= -->
+    <main class="workspace-view active" id="workspace-payments">
 
-        <!-- ===============================================================
-             LEFT COLUMN: FinTech Terminal & Enclave
-             =============================================================== -->
-        <section class="fintech-terminal-col">
-
-            <!-- Wallet & Offline Allowance Hero Panel -->
-            <div class="wallet-hero-panel">
-                <div class="balance-header-row">
-                    <span class="balance-label">Total Verified Balance</span>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <button class="balance-toggle-btn" id="btn-toggle-balance-vis" onclick="window.app.toggleBalanceVisibility()" title="Toggle Balance Privacy">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                <circle cx="12" cy="12" r="3"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <div class="balance-amount-row">
-                    <span class="balance-currency">₹</span>
-                    <span class="balance-value tabular-nums" id="user-balance-display">5,000.00</span>
-                </div>
-
-                <!-- RBI UPI-Lite Offline Allowance Gauge -->
-                <div class="allowance-section">
-                    <div class="allowance-info-row">
-                        <span class="allowance-title">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                            </svg>
-                            UPI-Lite Offline Limit (RBI ₹2,000 Cap)
-                        </span>
-                        <span class="allowance-remaining-amount tabular-nums" id="allowance-remaining-text">₹2,000.00 left</span>
-                    </div>
-                    <div class="allowance-meter-track">
-                        <div class="allowance-meter-fill" id="allowance-meter-bar" style="width: 100%;"></div>
-                    </div>
-                    <div class="allowance-disclaimer">
-                        <span>Max per transaction: ₹500</span>
-                        <a href="javascript:void(0)" onclick="window.app.topUpAllowance()" style="color: var(--brand-primary); text-decoration: none; font-weight: 600;">+ Top-Up / Reset Limit</a>
-                    </div>
-                </div>
+        <!-- Top Hero Balance Row -->
+        <div class="balance-hero-card">
+            <div class="balance-top-row">
+                <span class="balance-label">Verified Core Ledger Balance</span>
+                <button class="icon-button" onclick="window.app.toggleBalanceVisibility()" title="Toggle Balance Privacy">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="balance-val-row">
+                <span class="balance-currency">₹</span>
+                <span class="balance-amount tabular-nums" id="user-balance-display">5,000.00</span>
             </div>
 
-            <!-- Direct Payment Execution Terminal Card -->
-            <div class="terminal-card">
-                <div class="terminal-title-bar">
-                    <span class="terminal-title">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <!-- UPI-Lite Offline Allowance Gauge -->
+            <div class="allowance-box">
+                <div class="allowance-row">
+                    <span>UPI-Lite Offline Allowance (RBI ₹2,000 Cap)</span>
+                    <span class="tabular-nums" id="allowance-remaining-text">₹2,000.00 available</span>
+                </div>
+                <div class="allowance-bar-track">
+                    <div class="allowance-bar-fill" id="allowance-meter-bar" style="width: 100%;"></div>
+                </div>
+                <div class="allowance-meta">
+                    <span>Limit per offline transaction: ₹500.00</span>
+                    <a href="javascript:void(0)" onclick="window.app.topUpAllowance()" style="color: var(--brand-primary); text-decoration: underline; font-weight: 600;">+ Replenish Allowance</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2-Column Payment Interaction Grid -->
+        <div class="payments-grid">
+
+            <!-- Left: Payment Creation Form -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="22" y1="2" x2="11" y2="13"/>
                             <polygon points="22 2 15 22 11 13 2 9 22 2"/>
                         </svg>
-                        Initiate Offline Payment
-                    </span>
-                    <span class="enclave-badge">
-                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        </svg>
-                        Web Crypto Enclave
-                    </span>
+                        <span>Create Offline Payment</span>
+                    </div>
+                    <span class="exp-badge">Web Crypto Enclave</span>
                 </div>
 
-                <!-- Recipient Selector Grid -->
-                <label class="form-field-label">Select Nearby BLE Peer / Merchant in Range</label>
-                <div class="peer-select-grid" id="peer-grid">
+                <div class="editorial-callout">
+                    Encapsulates an offline payment instruction into an authenticated zero-trust hybrid envelope (RSA-2048-OAEP + AES-256-GCM). The payload is safely routable by untrusted intermediate devices without exposing amounts, PINs, or balances.
+                </div>
+
+                <!-- Recipient Selector -->
+                <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 8px;">Select Nearby Peer / Merchant in Range</label>
+                <div class="recipient-list-group" id="peer-grid">
                     <!-- Populated dynamically via app.js -->
                 </div>
 
                 <!-- Amount Input -->
-                <label class="form-field-label">Amount (INR)</label>
-                <div class="amount-terminal-input-wrap">
-                    <span class="amount-currency-symbol">₹</span>
-                    <input type="number" id="amount-input" class="amount-terminal-input tabular-nums" placeholder="0" min="1" max="500" value="100">
+                <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 8px;">Transaction Amount (INR)</label>
+                <div class="amount-input-wrap">
+                    <span class="amount-symbol">₹</span>
+                    <input type="number" id="amount-input" class="amount-field tabular-nums" min="1" max="500" value="100">
                 </div>
 
-                <!-- Quick Amount Pills -->
-                <div class="quick-amount-pill-row">
-                    <button class="pill-amt-btn" onclick="window.app.setAmount(50)">₹50</button>
-                    <button class="pill-amt-btn active" onclick="window.app.setAmount(100)">₹100</button>
-                    <button class="pill-amt-btn" onclick="window.app.setAmount(200)">₹200</button>
-                    <button class="pill-amt-btn" onclick="window.app.setAmount(500)">₹500</button>
+                <!-- Preset Quick Buttons -->
+                <div class="preset-row">
+                    <button class="preset-btn" onclick="window.app.setAmount(50)">₹50</button>
+                    <button class="preset-btn active" onclick="window.app.setAmount(100)">₹100</button>
+                    <button class="preset-btn" onclick="window.app.setAmount(200)">₹200</button>
+                    <button class="preset-btn" onclick="window.app.setAmount(500)">₹500</button>
                 </div>
 
-                <!-- Note / Memo Input -->
-                <div style="margin-bottom: 14px;">
-                    <label class="form-field-label">Note / Purpose</label>
-                    <input type="text" id="note-input" class="amount-terminal-input" style="font-size: 0.85rem; font-weight: 500; background: var(--surface-input); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px 12px;" placeholder="e.g. Chai, Metro token, Groceries" value="Coffee & Snacks">
-                </div>
+                <!-- Note Input -->
+                <label style="font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 8px;">Purpose / Note</label>
+                <input type="text" id="note-input" class="text-input" placeholder="e.g. Chai, Groceries, Metro token" value="Coffee & Snacks">
 
-                <!-- Execution Action Buttons -->
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn-authorize-pay" id="btn-open-pin" onclick="window.app.openPinModal('ble')" style="flex: 1;">
+                <!-- Submit Buttons -->
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-primary" onclick="window.app.openPinModal('ble')" style="flex: 1;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2">
                             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                         </svg>
-                        <span>Sign & Send via BLE Mesh</span>
+                        <span>Sign & Dispatch via Mesh</span>
                     </button>
-                    <button class="sim-btn info" onclick="window.app.openPinModal('qr')" style="padding: 0 16px; font-weight: 600;" title="Generate offline signed QR voucher">
+                    <button class="btn-secondary" onclick="window.app.openPinModal('qr')" title="Generate scannable offline optical voucher">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="3" y="3" width="7" height="7"/>
                             <rect x="14" y="3" width="7" height="7"/>
@@ -243,543 +219,631 @@
                         <span>Voucher QR</span>
                     </button>
                 </div>
-            </div>
 
-            <!-- Merchant Receive & Soundbox Card -->
-            <div class="soundbox-card">
-                <div class="soundbox-header">
-                    <span class="soundbox-title">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                        </svg>
-                        Merchant Soundbox & Dynamic QR
-                    </span>
-                    <span class="soundbox-status-pill">Speech Synthesis Active</span>
-                </div>
-                <p style="font-size: 0.72rem; color: var(--text-muted); margin-bottom: 10px;">
-                    Receives audio confirmations via the Web Speech API when offline packets settle at the central bank.
-                </p>
-                <div style="display: flex; gap: 8px;">
-                    <button class="sim-btn" onclick="window.app.openMerchantQrModal()" style="flex: 1; font-size: 0.75rem; justify-content: center;">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="7" height="7"/>
-                            <rect x="14" y="3" width="7" height="7"/>
-                            <rect x="3" y="14" width="7" height="7"/>
-                            <rect x="14" y="14" width="7" height="7"/>
-                        </svg>
-                        Show My UPI QR
-                    </button>
-                    <button class="sim-btn" onclick="window.app.testSoundbox()" style="flex: 1; font-size: 0.75rem; justify-content: center;">
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-                        </svg>
-                        Test Audio Chime
-                    </button>
-                </div>
-            </div>
-
-            <!-- Local Outbox Strip -->
-            <div class="outbox-sync-strip">
-                <div class="outbox-left">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-amber);">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                    <span>Local Device Outbox</span>
-                    <span class="outbox-count-badge" id="outbox-count">0</span>
-                </div>
-                <button class="btn-sync-small" id="btn-manual-sync" onclick="window.app.syncMeshToBank()">
-                    Flush to Bank
-                </button>
-            </div>
-
-            <!-- Verified Ledger Activity -->
-            <div class="terminal-card">
-                <div class="terminal-title-bar">
-                    <span class="terminal-title">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10 9 9 9 8 9"/>
-                        </svg>
-                        Verified Ledger Transactions
-                    </span>
-                    <span style="font-size: 0.68rem; color: var(--text-muted); cursor: pointer;" onclick="window.app.refreshLedgerAndBalances()">Refresh</span>
-                </div>
-                <div class="recent-ledger-box" id="tx-ledger-box">
-                    <div style="font-size: 0.75rem; color: var(--text-muted); text-align: center; padding: 12px;">
-                        No transactions recorded yet. Initiate an offline payment above.
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
-        <!-- ===============================================================
-             RIGHT COLUMN: Interactive Mesh Topology & Protocol Diagnostics
-             =============================================================== -->
-        <section class="network-protocol-col">
-
-            <!-- Interactive Topology Visualizer Card -->
-            <div class="topology-viewer-card">
-                <div class="topology-header-row">
-                    <div class="topology-title">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="18" cy="5" r="3"/>
-                            <circle cx="6" cy="12" r="3"/>
-                            <circle cx="18" cy="19" r="3"/>
-                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-                        </svg>
-                        <span>Gossip Mesh & Opportunistic Topology (N Nodes)</span>
-                    </div>
-
-                    <div class="topology-legend">
-                        <span style="display: inline-flex; align-items: center; gap: 4px;">
-                            <span class="legend-dot ble"></span> Offline Peer (0% Net)
-                        </span>
-                        <span style="display: inline-flex; align-items: center; gap: 4px;">
-                            <span class="legend-dot bridge"></span> 4G Bridge Ingress
-                        </span>
-                        <span style="display: inline-flex; align-items: center; gap: 4px;">
-                            <span class="legend-dot broken"></span> Link Severed
-                        </span>
-                    </div>
-                </div>
-
-                <!-- SVG Interactive Network Graph Canvas -->
-                <div class="network-graph-container" id="network-canvas-wrap">
-                    <svg id="topology-svg" class="topology-svg-canvas" viewBox="0 0 760 380">
-                        <!-- Links Layer -->
-                        <g id="svg-links-group">
-                            <line id="link-alice-bob" class="mesh-link active-ble" x1="100" y1="110" x2="270" y2="70" />
-                            <line id="link-alice-carol" class="mesh-link active-ble" x1="100" y1="110" x2="270" y2="190" />
-                            <line id="link-bob-dave" class="mesh-link active-ble" x1="270" y1="70" x2="450" y2="110" />
-                            <line id="link-carol-dave" class="mesh-link active-ble" x1="270" y1="190" x2="450" y2="110" />
-                            <line id="link-carol-bridge" class="mesh-link active-ble" x1="270" y1="190" x2="450" y2="270" />
-                            <line id="link-dave-bridge" class="mesh-link active-ble" x1="450" y1="110" x2="450" y2="270" />
-                            <line id="link-bridge-bank" class="mesh-link active-4g" x1="450" y1="270" x2="660" y2="190" />
-                        </g>
-
-                        <!-- Moving Packet Particle -->
-                        <circle id="transit-packet-dot" class="packet-transit-particle" cx="100" cy="110" r="7" style="display: none;" />
-
-                        <!-- Nodes Layer -->
-                        <g id="svg-nodes-group">
-                            <!-- Node 1: Alice (Sender) -->
-                            <g id="node-alice" class="graph-node active" transform="translate(100, 110)" onclick="window.app.inspectNode('phone-alice')">
-                                <circle class="node-circle-base" r="28" />
-                                <text y="-4" class="node-text-label">Alice</text>
-                                <text y="10" class="node-sub-label">Offline (Basement)</text>
-                            </g>
-
-                            <!-- Node 2: Bob (Merchant) -->
-                            <g id="node-bob" class="graph-node" transform="translate(270, 70)" onclick="window.app.inspectNode('phone-bob')">
-                                <circle class="node-circle-base" r="28" />
-                                <text y="-4" class="node-text-label">Bob (Store)</text>
-                                <text y="10" class="node-sub-label">BLE 1.2m</text>
-                            </g>
-
-                            <!-- Node 3: Carol (Relay) -->
-                            <g id="node-carol" class="graph-node" transform="translate(270, 190)" onclick="window.app.inspectNode('phone-carol')">
-                                <circle class="node-circle-base" r="28" />
-                                <text y="-4" class="node-text-label">Carol</text>
-                                <text y="10" class="node-sub-label">Relay (0% Net)</text>
-                            </g>
-
-                            <!-- Node 4: Dave (Relay) -->
-                            <g id="node-dave" class="graph-node" transform="translate(450, 110)" onclick="window.app.inspectNode('phone-dave')">
-                                <circle class="node-circle-base" r="28" />
-                                <text y="-4" class="node-text-label">Dave</text>
-                                <text y="10" class="node-sub-label">Relay (0% Net)</text>
-                            </g>
-
-                            <!-- Node 5: Bridge Node (4G Ingress) -->
-                            <g id="node-bridge" class="graph-node bridge-online" transform="translate(450, 270)" onclick="window.app.inspectNode('phone-bridge')">
-                                <circle class="node-circle-base" r="32" />
-                                <text y="-4" class="node-text-label">4G Bridge</text>
-                                <text y="10" class="node-sub-label">Cellular Ingress</text>
-                            </g>
-
-                            <!-- Node 6: Bank Core Gateway -->
-                            <g id="node-bank" class="graph-node bank-settle" transform="translate(660, 190)" onclick="window.app.inspectNode('cloud-bank')">
-                                <circle class="node-circle-base" r="34" />
-                                <text y="-4" class="node-text-label">Central Bank</text>
-                                <text y="10" class="node-sub-label">ACID Ledger</text>
-                            </g>
-                        </g>
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Multi-Tab Protocol Diagnostics -->
-            <div class="diagnostics-panel-card">
-                <!-- Navigation Tabs -->
-                <div class="diagnostics-tab-bar" role="tablist">
-                    <button class="diag-tab-btn active" id="tab-btn-packet" onclick="window.app.switchDiagTab('packet')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
-                            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                        </svg>
-                        <span>📦 Packet Inspector</span>
-                    </button>
-                    <button class="diag-tab-btn" id="tab-btn-cyber" onclick="window.app.switchDiagTab('cyber')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        </svg>
-                        <span>🛡️ Cyber Attack Lab</span>
-                    </button>
-                    <button class="diag-tab-btn" id="tab-btn-studio" onclick="window.app.switchDiagTab('studio')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2"/>
-                            <path d="M9 3v18M15 3v18"/>
-                        </svg>
-                        <span>👥 Variable N-Device Studio</span>
-                    </button>
-                    <button class="diag-tab-btn" id="tab-btn-timeline" onclick="window.app.switchDiagTab('timeline')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <!-- Local Outbox Strip -->
+                <div class="outbox-strip">
+                    <div class="outbox-label">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--accent-warning);">
                             <circle cx="12" cy="12" r="10"/>
                             <polyline points="12 6 12 12 16 14"/>
                         </svg>
-                        <span>📜 Live Timeline</span>
+                        <span>Pending Outbox Packets: <strong id="outbox-count">0</strong></span>
+                    </div>
+                    <button class="btn-secondary" onclick="window.app.syncMeshToBank()" style="padding: 4px 12px; font-size: 0.74rem;">
+                        Flush to Bank
                     </button>
-                </div>
-
-                <!-- Tab Pane 1: Packet Inspector -->
-                <div class="diag-tab-content active" id="pane-packet">
-                    <div class="packet-inspector-grid">
-                        <div class="meta-field-box">
-                            <div class="meta-field-label">Packet UUID / Wire ID</div>
-                            <div class="meta-field-value highlight" id="inspect-packet-id">pkt-none-queued</div>
-                        </div>
-                        <div class="meta-field-box">
-                            <div class="meta-field-label">Cryptographic Cipher Suite</div>
-                            <div class="meta-field-value">RSA-2048-OAEP + AES-256-GCM</div>
-                        </div>
-                        <div class="meta-field-box">
-                            <div class="meta-field-label">Sender VPA (Encrypted Payload)</div>
-                            <div class="meta-field-value" id="inspect-sender-vpa">alice@demo</div>
-                        </div>
-                        <div class="meta-field-box">
-                            <div class="meta-field-label">Recipient VPA (Destination)</div>
-                            <div class="meta-field-value" id="inspect-receiver-vpa">bob@demo</div>
-                        </div>
-                        <div class="meta-field-box">
-                            <div class="meta-field-label">SHA-256 Idempotency Digest</div>
-                            <div class="meta-field-value highlight" id="inspect-hash-digest">Waiting for transaction...</div>
-                        </div>
-                        <div class="meta-field-box">
-                            <div class="meta-field-label">Mesh Routing Status</div>
-                            <div class="meta-field-value" id="inspect-route-status">TTL: 5 hops | Status: Idle</div>
-                        </div>
-                        <div class="meta-field-box">
-                            <div class="meta-field-label">Digital Signature / Integrity</div>
-                            <div class="meta-field-value" id="inspect-sig-status" style="color: var(--brand-primary);">HARDWARE_ENCLAVE_SIGNED (256-bit ECDSA)</div>
-                        </div>
-                        <div class="meta-field-box">
-                            <div class="meta-field-label">Envelope Wire Size</div>
-                            <div class="meta-field-value" id="inspect-wire-size">~384 bytes (Optimized for BLE 20-byte MTU)</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab Pane 2: Cyber Attack Lab -->
-                <div class="diag-tab-content" id="pane-cyber">
-                    <div class="cyber-attack-grid">
-                        <!-- Attack 1: Replay Attack -->
-                        <div class="cyber-card warning">
-                            <div>
-                                <div class="cyber-title">
-                                    <span>🔁 Replay Attack Defense</span>
-                                    <span class="status-pill warning">SHA-256 Idempotency</span>
-                                </div>
-                                <div class="cyber-desc">
-                                    Attempts to re-transmit an already settled cryptographic packet to double-charge the sender.
-                                </div>
-                            </div>
-                            <button class="sim-btn warning" onclick="window.app.runReplayAttack()" style="justify-content: center; width: 100%;">
-                                Execute Replay Test
-                            </button>
-                            <div class="cyber-result-box" id="result-replay">Awaiting execution...</div>
-                        </div>
-
-                        <!-- Attack 2: Tamper Bit-Flip Attack -->
-                        <div class="cyber-card danger">
-                            <div>
-                                <div class="cyber-title">
-                                    <span>⚡ Bit-Flip Cipher Tamper</span>
-                                    <span class="status-pill danger">AES-GCM Tag Guard</span>
-                                </div>
-                                <div class="cyber-desc">
-                                    Simulates an adversary modifying 1 single bit in the ciphertext during transit to change the amount.
-                                </div>
-                            </div>
-                            <button class="sim-btn danger" onclick="window.app.runTamperAttack()" style="justify-content: center; width: 100%;">
-                                Execute Tamper Test
-                            </button>
-                            <div class="cyber-result-box" id="result-tamper">Awaiting execution...</div>
-                        </div>
-
-                        <!-- Attack 3: Zero-Knowledge Snoop Test -->
-                        <div class="cyber-card info">
-                            <div>
-                                <div class="cyber-title">
-                                    <span>👁️ Relay Eavesdropping Defense</span>
-                                    <span class="status-pill info">Zero-Trust Envelope</span>
-                                </div>
-                                <div class="cyber-desc">
-                                    Inspects the packet from the perspective of intermediate peers (Carol/Dave) to prove zero data leakage.
-                                </div>
-                            </div>
-                            <button class="sim-btn" onclick="window.app.runSnoopingTest()" style="justify-content: center; width: 100%;">
-                                Inspect As Relay Peer
-                            </button>
-                            <div class="cyber-result-box" id="result-snoop">Awaiting inspection...</div>
-                        </div>
-
-                        <!-- Attack 4: Double-Spend Blocker -->
-                        <div class="cyber-card success">
-                            <div>
-                                <div class="cyber-title">
-                                    <span>🛑 Double-Spend Allowance Cap</span>
-                                    <span class="status-pill settled">RBI ₹2,000 Cap</span>
-                                </div>
-                                <div class="cyber-desc">
-                                    Demonstrates that local offline balance cannot exceed ₹2,000 without reconciling with the central bank.
-                                </div>
-                            </div>
-                            <button class="sim-btn" onclick="window.app.testDoubleSpendLimit()" style="justify-content: center; width: 100%;">
-                                Test Over-Allowance (₹2,500)
-                            </button>
-                            <div class="cyber-result-box" id="result-doublespend">Awaiting test...</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tab Pane 3: Variable N-Device Studio -->
-                <div class="diag-tab-content" id="pane-studio">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                        <div>
-                            <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Active Nodes in Mesh Topology</span>
-                            <span style="font-size: 0.72rem; color: var(--text-muted); margin-left: 6px;">(Supports any number of connected phones)</span>
-                        </div>
-                        <button class="sim-btn" onclick="window.app.openAddDeviceModal()" style="font-size: 0.72rem; padding: 4px 10px;">
-                            + Register Phone
-                        </button>
-                    </div>
-
-                    <div class="device-roster-grid" id="device-roster-container">
-                        <!-- Populated dynamically via app.js -->
-                    </div>
-                </div>
-
-                <!-- Tab Pane 4: Live Event Timeline -->
-                <div class="diag-tab-content" id="pane-timeline">
-                    <div class="timeline-feed-box" id="timeline-feed">
-                        <div class="timeline-event-row gossip" onclick="window.app.inspectNode('phone-alice')">
-                            <span class="event-timestamp">[System Ready]</span>
-                            <span class="event-message">MeshPay Engine initialized. 5 sample nodes online in local cluster.</span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
-        </section>
+            <!-- Right: Educational Walkthrough & Merchant Soundbox -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+
+                <!-- Editorial Step-by-Step Infographic -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polygon points="10 8 16 12 10 16 10 8"/>
+                            </svg>
+                            <span>Offline Lifecycle Architecture</span>
+                        </div>
+                        <span class="card-subtitle">RFC 4838 Delay-Tolerant Networking</span>
+                    </div>
+
+                    <div class="workflow-steps-box">
+                        <div class="workflow-step">
+                            <div class="step-num-badge">1</div>
+                            <div class="step-content">
+                                <span class="step-title">Client-Side Hybrid Cryptography</span>
+                                <span class="step-desc">Sender generates a one-time 256-bit AES key, encrypts instruction JSON with AES-GCM, and encrypts the AES key with the Bank's RSA-2048 public key.</span>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-num-badge">2</div>
+                            <div class="step-content">
+                                <span class="step-title">Local IndexedDB Outbox Persistence</span>
+                                <span class="step-desc">The encrypted envelope is securely held in browser IndexedDB. Transactions survive device reboots and basement connectivity loss.</span>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-num-badge">3</div>
+                            <div class="step-content">
+                                <span class="step-title">Store-and-Forward Gossip Relay</span>
+                                <span class="step-desc">Packets hop across nearby BLE peers (Carol, Dave). Intermediate nodes forward packets without having cryptographic ability to read balances or PINs.</span>
+                            </div>
+                        </div>
+                        <div class="workflow-step">
+                            <div class="step-num-badge">4</div>
+                            <div class="step-content">
+                                <span class="step-title">Opportunistic 4G Ingress & Settlement</span>
+                                <span class="step-desc">Any node with cellular internet acts as a bridge, uploading packets to the central bank for SHA-256 deduplication and atomic ledger settlement.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Merchant Soundbox & Quick QR Display -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                            </svg>
+                            <span>Merchant Soundbox & QR Hub</span>
+                        </div>
+                        <span class="card-subtitle">Payee Audio & Optical Ingress</span>
+                    </div>
+
+                    <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.45;">
+                        Merchants receive real-time voice confirmations via the Web Speech API when offline packets settle, and can display static or dynamic QR codes for customer scanning.
+                    </p>
+
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-secondary" onclick="window.app.openMerchantQrModal()" style="flex: 1;">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="3" y="14" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/>
+                            </svg>
+                            <span>Display Merchant QR</span>
+                        </button>
+                        <button class="btn-secondary" onclick="window.app.openScannerModal()" style="flex: 1;">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
+                            </svg>
+                            <span>Scan Optical Voucher</span>
+                        </button>
+                        <button class="btn-secondary" onclick="window.app.testSoundbox()" title="Test Soundbox Audio Chime">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
 
     </main>
 
-</div>
+    <!-- =======================================================================
+         WORKSPACE 2 — NETWORK & MESH SIMULATION
+         ======================================================================= -->
+    <main class="workspace-view" id="workspace-network">
 
-<!-- ===============================================================
-     Modal: 4-Digit UPI PIN Pad
-     =============================================================== -->
-<div class="modal-backdrop-layer" id="pin-modal-backdrop">
-    <div class="modal-dialog-card">
-        <div style="text-align: center; margin-bottom: 12px;">
-            <div style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary);">Enter UPI PIN</div>
-            <div style="font-size: 0.76rem; color: var(--text-muted); margin-top: 3px;">
-                Signing offline payment of <strong style="color: var(--brand-primary);" id="pin-modal-amount">₹100</strong> to <strong id="pin-modal-recipient">Bob Verma</strong>
+        <!-- Network Controls Bar -->
+        <div class="network-controls-bar">
+            <button class="btn-primary" id="btn-sim-autorun" onclick="window.app.toggleAutoRun()" style="width: auto; padding: 8px 16px;">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                <span id="btn-autorun-label">Auto Run</span>
+            </button>
+            <button class="btn-secondary" onclick="window.app.stepSimulationHop()">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"/>
+                </svg>
+                <span>Step Single Hop</span>
+            </button>
+            <button class="btn-secondary" onclick="window.app.syncMeshToBank()">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <span>Sync Bridges to Bank</span>
+            </button>
+            <button class="btn-secondary" onclick="window.app.toggleLinkFailure()" id="btn-link-failure">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                </svg>
+                <span id="label-link-toggle">Break Primary Link</span>
+            </button>
+            <button class="btn-secondary" onclick="window.app.openResetModal()" style="margin-left: auto;">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 2v6h6"/>
+                    <path d="M3 13a9 9 0 1 0 3-7.7L3 8"/>
+                </svg>
+                <span>Reset Network State</span>
+            </button>
+        </div>
+
+        <!-- SVG Topology Visualizer -->
+        <div class="topology-canvas-wrap">
+            <svg id="topology-svg" class="topology-svg" viewBox="0 0 760 380">
+                <!-- Links Layer -->
+                <g id="svg-links-group">
+                    <line id="link-alice-bob" class="mesh-link active" x1="100" y1="110" x2="270" y2="70" />
+                    <line id="link-alice-carol" class="mesh-link active" x1="100" y1="110" x2="270" y2="190" />
+                    <line id="link-bob-dave" class="mesh-link active" x1="270" y1="70" x2="450" y2="110" />
+                    <line id="link-carol-dave" class="mesh-link active" x1="270" y1="190" x2="450" y2="110" />
+                    <line id="link-carol-bridge" class="mesh-link active" x1="270" y1="190" x2="450" y2="270" />
+                    <line id="link-dave-bridge" class="mesh-link active" x1="450" y1="110" x2="450" y2="270" />
+                    <line id="link-bridge-bank" class="mesh-link active" x1="450" y1="270" x2="660" y2="190" />
+                </g>
+
+                <!-- Moving Packet Particle -->
+                <circle id="transit-packet-dot" cx="100" cy="110" r="7" fill="#CBB3E8" stroke="#1F3B2E" stroke-width="2" style="display: none;" />
+
+                <!-- Nodes Layer -->
+                <g id="svg-nodes-group">
+                    <!-- Node 1: Alice (Sender) -->
+                    <g id="node-alice" class="mesh-node active" transform="translate(100, 110)" onclick="window.app.inspectNode('phone-alice')">
+                        <circle class="base" r="28" />
+                        <text y="-4" class="title">Alice</text>
+                        <text y="10" class="subtitle">Sender (Offline)</text>
+                    </g>
+                    <!-- Node 2: Bob (Merchant) -->
+                    <g id="node-bob" class="mesh-node" transform="translate(270, 70)" onclick="window.app.inspectNode('phone-bob')">
+                        <circle class="base" r="28" />
+                        <text y="-4" class="title">Bob</text>
+                        <text y="10" class="subtitle">Merchant (BLE)</text>
+                    </g>
+                    <!-- Node 3: Carol (Relay) -->
+                    <g id="node-carol" class="mesh-node" transform="translate(270, 190)" onclick="window.app.inspectNode('phone-carol')">
+                        <circle class="base" r="28" />
+                        <text y="-4" class="title">Carol</text>
+                        <text y="10" class="subtitle">Relay Hop 1</text>
+                    </g>
+                    <!-- Node 4: Dave (Relay) -->
+                    <g id="node-dave" class="mesh-node" transform="translate(450, 110)" onclick="window.app.inspectNode('phone-dave')">
+                        <circle class="base" r="28" />
+                        <text y="-4" class="title">Dave</text>
+                        <text y="10" class="subtitle">Relay Hop 2</text>
+                    </g>
+                    <!-- Node 5: Eve (Bridge) -->
+                    <g id="node-bridge" class="mesh-node bridge" transform="translate(450, 270)" onclick="window.app.inspectNode('phone-bridge')">
+                        <circle class="base" r="32" />
+                        <text y="-4" class="title">Eve Bridge</text>
+                        <text y="10" class="subtitle">4G Ingress Node</text>
+                    </g>
+                    <!-- Node 6: Bank Core -->
+                    <g id="node-bank" class="mesh-node" transform="translate(660, 190)" onclick="window.app.inspectNode('cloud-bank')">
+                        <circle class="base" r="34" />
+                        <text y="-4" class="title">Central Bank</text>
+                        <text y="10" class="subtitle">ACID Ledger</text>
+                    </g>
+                </g>
+            </svg>
+        </div>
+
+        <!-- Connected Device Cluster Section -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                    <span>Participating Device Cluster (Variable N Nodes)</span>
+                </div>
+                <button class="btn-secondary" onclick="window.app.openAddDeviceModal()" style="padding: 4px 12px; font-size: 0.76rem;">
+                    + Register Custom Node
+                </button>
+            </div>
+
+            <div class="device-roster-grid" id="device-roster-container">
+                <!-- Dynamically populated via app.js -->
             </div>
         </div>
 
-        <!-- PIN Bubbles -->
-        <div class="pin-indicator-dots" id="pin-bubbles">
-            <span class="pin-bubble-dot"></span>
-            <span class="pin-bubble-dot"></span>
-            <span class="pin-bubble-dot"></span>
-            <span class="pin-bubble-dot"></span>
+    </main>
+
+    <!-- =======================================================================
+         WORKSPACE 3 — TRANSACTIONS & VERIFIED LEDGER
+         ======================================================================= -->
+    <main class="workspace-view" id="workspace-transactions">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    <span>Central Bank Audit Ledger & Settlement Journal</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="tx-search-input" class="text-input" placeholder="Search VPA or Nonce..." oninput="window.app.filterTransactions()" style="margin: 0; padding: 6px 12px; font-size: 0.78rem; width: 220px;">
+                    <button class="btn-secondary" onclick="window.app.refreshLedgerAndBalances()" style="padding: 6px 12px; font-size: 0.76rem;">
+                        Refresh Journal
+                    </button>
+                </div>
+            </div>
+
+            <div class="editorial-callout">
+                Each settled transaction represents an atomic ACID ledger entry debited and credited in relational persistence. Cryptographic hash guarantees idempotency across duplicate deliveries and server restarts.
+            </div>
+
+            <div class="ledger-table-wrap">
+                <table class="ledger-table">
+                    <thead>
+                        <tr>
+                            <th>Tx ID</th>
+                            <th>Sender</th>
+                            <th>Recipient</th>
+                            <th>Amount</th>
+                            <th>Signed At</th>
+                            <th>Bridge Node</th>
+                            <th>Hops</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="full-ledger-tbody">
+                        <!-- Populated dynamically via app.js -->
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- Numeric Keypad -->
-        <div class="numeric-keypad-grid">
-            <button class="keypad-key-btn" onclick="window.app.enterPinDigit('1')">1</button>
-            <button class="keypad-key-btn" onclick="window.app.enterPinDigit('2')">2</button>
-            <button class="keypad-key-btn" onclick="window.app.enterPinDigit('3')">3</button>
-            <button class="keypad-key-btn" onclick="window.app.enterPinDigit('4')">4</button>
-            <button class="keypad-key-btn" onclick="window.app.enterPinDigit('5')">5</button>
-            <button class="keypad-key-btn" onclick="window.app.enterPinDigit('6')">6</button>
-            <button class="keypad-key-btn" onclick="window.app.enterPinDigit('7')">7</button>
-            <button class="keypad-key-btn" onclick="window.app.enterPinDigit('8')">8</button>
-            <button class="keypad-key-btn" onclick="window.app.enterPinDigit('9')">9</button>
-            <button class="keypad-key-btn" style="color: var(--accent-red);" onclick="window.app.closePinModal()">✕</button>
-            <button class="keypad-key-btn" onclick="window.app.enterPinDigit('0')">0</button>
-            <button class="keypad-key-btn" style="color: var(--accent-amber);" onclick="window.app.backspacePin()">⌫</button>
+    </main>
+
+    <!-- =======================================================================
+         WORKSPACE 4 — ADVANCED LABORATORY & EXPERIMENTS
+         ======================================================================= -->
+    <main class="workspace-view" id="workspace-lab">
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 2v7.31L4.69 18.5A2 2 0 0 0 6.4 21.5h11.2a2 2 0 0 0 1.71-3L14 9.31V2"/>
+                        <path d="M8.5 2h7"/>
+                    </svg>
+                    <span>Interactive Engineering Experiments Testbed</span>
+                </div>
+                <span class="card-subtitle">Designed for College Viva & Technical Defense</span>
+            </div>
+
+            <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 20px;">
+                Demonstrates how MeshPay solves fundamental edge-case challenges in offline digital transactions: duplicate packet storms, MITM tampering, semantic re-encryption replay, and broken routing links.
+            </p>
+
+            <div class="lab-grid">
+
+                <!-- Experiment 1 -->
+                <div class="experiment-card">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="exp-badge">Experiment 1</span>
+                            <span class="status-pill settled">Core Routing</span>
+                        </div>
+                        <div class="exp-title">End-to-End Store-Carry-Forward Delivery</div>
+                        <div class="exp-desc">Creates a ₹100 payment offline, hops across BLE relays to Eve Bridge, and syncs to Central Bank.</div>
+                    </div>
+                    <div class="exp-console" id="exp-console-1">Ready. Click Run to simulate normal packet lifecycle.</div>
+                    <button class="btn-secondary" onclick="window.app.runExpNormalDelivery()">Run Experiment 1</button>
+                    <div class="exp-conclusion">Proves Store-and-Forward routing (RFC 4838) functions over untrusted peers without internet.</div>
+                </div>
+
+                <!-- Experiment 2 -->
+                <div class="experiment-card">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="exp-badge">Experiment 2</span>
+                            <span class="status-pill queued_offline">Resilience</span>
+                        </div>
+                        <div class="exp-title">Network Interruption & Outbox Buffering</div>
+                        <div class="exp-desc">Cuts bridge 4G cellular backhaul. Packet is safely buffered in outbox; connectivity is restored, and packet flushes.</div>
+                    </div>
+                    <div class="exp-console" id="exp-console-2">Ready. Click Run to simulate network failure & recovery.</div>
+                    <button class="btn-secondary" onclick="window.app.runExpNetworkInterruption()">Run Experiment 2</button>
+                    <div class="exp-conclusion">Proves zero packet loss when cellular backhaul experiences intermittent connection drops.</div>
+                </div>
+
+                <!-- Experiment 3 -->
+                <div class="experiment-card">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="exp-badge">Experiment 3</span>
+                            <span class="status-pill duplicate_dropped">Duplicate Storm</span>
+                        </div>
+                        <div class="exp-title">Ciphertext Duplicate Replay (SHA-256 Gate)</div>
+                        <div class="exp-desc">Delivers the exact same signed envelope twice from different bridge devices to test idempotency deduplication.</div>
+                    </div>
+                    <div class="exp-console" id="exp-console-3">Ready. Click Run to trigger identical packet replay.</div>
+                    <button class="btn-secondary" onclick="window.app.runExpDuplicateReplay()">Run Experiment 3</button>
+                    <div class="exp-conclusion">Proves duplicate copies are dropped atomically at the gateway before ledger debit.</div>
+                </div>
+
+                <!-- Experiment 4 -->
+                <div class="experiment-card">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="exp-badge">Experiment 4</span>
+                            <span class="status-pill rejected">Integrity</span>
+                        </div>
+                        <div class="exp-title">Ciphertext Bit-Flip Tampering (AES-256-GCM)</div>
+                        <div class="exp-desc">An attacker flips 1 character in the AES-GCM ciphertext to alter the amount. Tested against the bank gateway.</div>
+                    </div>
+                    <div class="exp-console" id="exp-console-4">Ready. Click Run to tamper with envelope ciphertext.</div>
+                    <button class="btn-secondary" onclick="window.app.runExpBitFlipTamper()">Run Experiment 4</button>
+                    <div class="exp-conclusion">Proves AES-GCM 128-bit authentication tags prevent any in-flight tampering by intermediate nodes.</div>
+                </div>
+
+                <!-- Experiment 5 -->
+                <div class="experiment-card">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="exp-badge">Experiment 5</span>
+                            <span class="status-pill duplicate_dropped">Semantic Defense</span>
+                        </div>
+                        <div class="exp-title">Re-Encryption Semantic Nonce Replay</div>
+                        <div class="exp-desc">Re-encrypts the same intent with a fresh random AES IV. Tested against server semantic nonce database constraint.</div>
+                    </div>
+                    <div class="exp-console" id="exp-console-5">Ready. Click Run to test re-encryption replay.</div>
+                    <button class="btn-secondary" onclick="window.app.runExpSemanticReplay()">Run Experiment 5</button>
+                    <div class="exp-conclusion">Proves (senderVpa, nonce) uniqueness prevents re-encryption attacks bypassing SHA-256 hash checks.</div>
+                </div>
+
+                <!-- Experiment 6 -->
+                <div class="experiment-card">
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="exp-badge">Experiment 6</span>
+                            <span class="status-pill relaying">Mesh Adaptation</span>
+                        </div>
+                        <div class="exp-title">Broken Link Gossip Rerouting</div>
+                        <div class="exp-desc">Breaks the direct Alice-Carol link; verifies mesh gossip dynamically discovers alternative path via Bob to Dave.</div>
+                    </div>
+                    <div class="exp-console" id="exp-console-6">Ready. Click Run to test mesh dynamic rerouting.</div>
+                    <button class="btn-secondary" onclick="window.app.runExpLinkReroute()">Run Experiment 6</button>
+                    <div class="exp-conclusion">Proves decentralized multi-hop routing adapts dynamically around broken or out-of-range physical nodes.</div>
+                </div>
+
+            </div>
         </div>
 
-        <div style="font-size: 0.68rem; color: var(--text-muted); text-align: center; margin-top: 6px;">
-            Demo Default PIN: <strong>1234</strong>
+        <!-- Packet Inspector Card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                    </svg>
+                    <span>Cryptographic Packet Inspector</span>
+                </div>
+                <span class="card-subtitle">Zero-Knowledge Forwarder Verification</span>
+            </div>
+
+            <div class="editorial-callout">
+                Examine the exact byte-level contents held by intermediate forwarders. Intermediate nodes see only randomized ciphertext; amount, PIN, and balance remain cryptographically concealed.
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+                <div class="allowance-box">
+                    <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Packet UUID (Wire ID)</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.78rem; word-break: break-all;" id="inspect-packet-id">pkt-none-queued</span>
+                </div>
+                <div class="allowance-box">
+                    <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">SHA-256 Idempotency Hash</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.78rem; word-break: break-all;" id="inspect-hash-digest">Waiting for transaction...</span>
+                </div>
+                <div class="allowance-box">
+                    <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Cryptographic Suite</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.78rem;">RSA-2048-OAEP + AES-256-GCM (128-bit tag)</span>
+                </div>
+                <div class="allowance-box">
+                    <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Forwarder Visibility</span>
+                    <span style="font-family: var(--font-mono); font-size: 0.78rem; color: var(--accent-success);">ZERO-KNOWLEDGE (Payload Fully Encrypted)</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Global Editorial Footer -->
+    <footer class="app-footer">
+        <div>
+            <strong>MeshPay (upiSETU)</strong> — Final Year Capstone Project.
+            <span class="footer-attribution">Built on the open-source foundation of <a href="https://github.com/perryvegehan/UPI_Without_Internet" target="_blank" rel="noopener">perryvegehan/UPI_Without_Internet</a>.</span>
+        </div>
+        <div style="display: flex; gap: 14px; font-family: var(--font-mono); font-size: 0.7rem;">
+            <span>Java 21 LTS</span>
+            <span>Spring Boot 3.3.5</span>
+            <span>Web Crypto Hybrid Encryption</span>
+            <span>H2 Persistence</span>
+        </div>
+    </footer>
+
+</div>
+
+<!-- ===========================================================================
+     MODALS
+     =========================================================================== -->
+
+<!-- 1. PIN Keypad Modal -->
+<div class="modal-backdrop" id="pin-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="pin-modal-title">
+    <div class="modal-box" style="max-width: 380px; text-align: center;">
+        <h3 id="pin-modal-title" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 6px;">Enter 4-Digit UPI PIN</h3>
+        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 12px;">Authorizing <span id="pin-modal-amount" style="font-weight: 700; color: var(--text-primary);">₹100.00</span> to <span id="pin-modal-recipient" style="font-weight: 700; color: var(--text-primary);">Merchant</span></p>
+
+        <div class="pin-bubbles-row">
+            <div class="pin-bubble"></div>
+            <div class="pin-bubble"></div>
+            <div class="pin-bubble"></div>
+            <div class="pin-bubble"></div>
+        </div>
+
+        <div class="pin-keypad-grid">
+            <button class="pin-key-btn" onclick="window.app.enterPinDigit('1')">1</button>
+            <button class="pin-key-btn" onclick="window.app.enterPinDigit('2')">2</button>
+            <button class="pin-key-btn" onclick="window.app.enterPinDigit('3')">3</button>
+            <button class="pin-key-btn" onclick="window.app.enterPinDigit('4')">4</button>
+            <button class="pin-key-btn" onclick="window.app.enterPinDigit('5')">5</button>
+            <button class="pin-key-btn" onclick="window.app.enterPinDigit('6')">6</button>
+            <button class="pin-key-btn" onclick="window.app.enterPinDigit('7')">7</button>
+            <button class="pin-key-btn" onclick="window.app.enterPinDigit('8')">8</button>
+            <button class="pin-key-btn" onclick="window.app.enterPinDigit('9')">9</button>
+            <button class="pin-key-btn" onclick="window.app.closePinModal()" style="font-size: 0.8rem; color: var(--text-muted);">Cancel</button>
+            <button class="pin-key-btn" onclick="window.app.enterPinDigit('0')">0</button>
+            <button class="pin-key-btn" onclick="window.app.backspacePin()" style="font-size: 0.8rem;">⌫</button>
         </div>
     </div>
 </div>
 
-<!-- ===============================================================
-     Modal: Offline Voucher QR Code Display
-     =============================================================== -->
-<div class="modal-backdrop-layer" id="qr-display-modal-backdrop">
-    <div class="qr-modal-card">
-        <div style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;" id="qr-modal-title">
-            Offline Payment Voucher QR
-        </div>
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;" id="qr-modal-subtitle">
-            Scan this optical voucher with any nearby peer phone to transport payment without radio.
-        </p>
+<!-- 2. QR Display Modal -->
+<div class="modal-backdrop" id="qr-display-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title">
+    <div class="modal-box" style="max-width: 420px; text-align: center;">
+        <h3 id="qr-modal-title" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 6px;">Offline Payment Voucher</h3>
+        <p id="qr-modal-subtitle" style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px;">Scan with peer device to transfer signed envelope</p>
 
-        <div class="qr-display-box" id="qr-svg-target">
-            <!-- Dynamic SVG injected here -->
+        <div id="qr-svg-target" style="display: flex; justify-content: center; margin-bottom: 16px;"></div>
+
+        <div style="background: var(--surface-muted); padding: 10px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-secondary); word-break: break-all; margin-bottom: 16px; text-align: left;" id="qr-raw-payload-preview">
+            meshpay://voucher?data=...
         </div>
 
-        <div style="font-size: 0.72rem; font-family: var(--font-mono); color: var(--text-muted); word-break: break-all; margin-bottom: 14px;" id="qr-raw-payload-preview">
-            Waiting for payload...
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-primary" onclick="window.app.simulateScanThisVoucher()" style="flex: 1;">Simulate Peer Scan</button>
+            <button class="btn-secondary" onclick="window.app.closeQrDisplayModal()">Close</button>
         </div>
+    </div>
+</div>
+
+<!-- 3. QR Camera Scanner Modal -->
+<div class="modal-backdrop" id="qr-scanner-modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-box" style="max-width: 440px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 6px;">Optical Voucher Scanner</h3>
+        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 14px;">Point camera at voucher or paste encoded payload</p>
+
+        <div style="position: relative; width: 100%; aspect-ratio: 4/3; background: #000; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 14px;">
+            <video id="qr-video-feed" playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+        </div>
+
+        <input type="text" id="manual-qr-input" class="text-input" placeholder="Paste meshpay://voucher?data=... string" style="margin-bottom: 10px;">
 
         <div style="display: flex; gap: 8px;">
-            <button class="sim-btn" onclick="window.app.closeQrDisplayModal()" style="flex: 1; justify-content: center;">Close</button>
-            <button class="sim-btn primary" onclick="window.app.simulateScanThisVoucher()" style="flex: 1.5; justify-content: center;">Simulate Peer Scan</button>
+            <button class="btn-primary" onclick="window.app.decodeManualQrInput()" style="flex: 1;">Decode Paste</button>
+            <button class="btn-secondary" onclick="window.app.scanSampleVoucher()" style="flex: 1;">Load Demo Voucher</button>
+            <button class="btn-secondary" onclick="window.app.closeScannerModal()">Close</button>
         </div>
     </div>
 </div>
 
-<!-- ===============================================================
-     Modal: QR Scanner / Optical Decoder
-     =============================================================== -->
-<div class="modal-backdrop-layer" id="qr-scanner-modal-backdrop">
-    <div class="qr-modal-card">
-        <div style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
-            Scan Offline Payment Voucher
-        </div>
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">
-            Point camera at a MeshPay QR, paste a voucher payload, or click Test Voucher.
-        </p>
+<!-- 4. Add Device Modal -->
+<div class="modal-backdrop" id="add-device-modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-box" style="max-width: 440px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 6px;">Register Node to Mesh</h3>
+        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px;">Dynamically configure a variable phone or simulated relay</p>
 
-        <div class="qr-scanner-viewfinder">
-            <video id="qr-video-feed" playsinline autoplay muted></video>
-            <div class="qr-scan-laser"></div>
-        </div>
+        <label style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 4px;">Node Display Name</label>
+        <input type="text" id="new-device-name" class="text-input" placeholder="e.g. Farhan Merchant">
 
-        <div style="margin-bottom: 12px;">
-            <input type="text" id="manual-qr-input" class="amount-terminal-input" style="font-size: 0.75rem; font-family: var(--font-mono); padding: 8px;" placeholder="Paste meshpay://voucher?data=... or UPI string">
-        </div>
+        <label style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 4px;">Virtual Payment Address (VPA)</label>
+        <input type="text" id="new-device-vpa" class="text-input" placeholder="e.g. farhan@demo">
 
-        <div style="display: flex; gap: 8px;">
-            <button class="sim-btn" onclick="window.app.closeScannerModal()" style="flex: 1; justify-content: center;">Cancel</button>
-            <button class="sim-btn info" onclick="window.app.decodeManualQrInput()" style="flex: 1.2; justify-content: center;">Decode Paste</button>
-            <button class="sim-btn primary" onclick="window.app.scanSampleVoucher()" style="flex: 1.4; justify-content: center;">Test Voucher</button>
-        </div>
-    </div>
-</div>
-
-<!-- ===============================================================
-     Modal: Add Custom Phone / Device
-     =============================================================== -->
-<div class="modal-backdrop-layer" id="add-device-modal-backdrop">
-    <div class="modal-dialog-card">
-        <div style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
-            Register Phone to Mesh (Node N)
-        </div>
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 14px;">
-            Add a new participant or physical device into the multi-hop network.
-        </p>
-
-        <label class="form-field-label">User / Device Name</label>
-        <input type="text" id="new-device-name" class="amount-terminal-input" style="font-size: 0.85rem; padding: 8px; margin-bottom: 10px;" placeholder="e.g. Rahul Mehta, Vendor Shop #3">
-
-        <label class="form-field-label">Virtual Payment Address (VPA)</label>
-        <input type="text" id="new-device-vpa" class="amount-terminal-input" style="font-size: 0.85rem; padding: 8px; margin-bottom: 10px;" placeholder="e.g. rahul@demo">
-
-        <label class="form-field-label">Device Role</label>
-        <select id="new-device-role" class="amount-terminal-input" style="font-size: 0.85rem; padding: 8px; margin-bottom: 10px; width: 100%;">
-            <option value="RELAY">Peer Relay (Transports encrypted packets)</option>
-            <option value="SENDER">Payer (Offline sender in basement)</option>
-            <option value="MERCHANT">Merchant / Payee (Accepts offline payments)</option>
-            <option value="BRIDGE">Cellular Bridge (Has 4G / Wi-Fi backhaul)</option>
+        <label style="font-size: 0.78rem; font-weight: 600; display: block; margin-bottom: 4px;">Node Role</label>
+        <select id="new-device-role" class="user-select-dropdown" style="width: 100%; margin-bottom: 14px;">
+            <option value="RELAY">RELAY (Store & Forward)</option>
+            <option value="MERCHANT">MERCHANT (Payee)</option>
+            <option value="SENDER">SENDER (Payer)</option>
+            <option value="BRIDGE">BRIDGE (4G Cellular Uplink)</option>
         </select>
 
         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-            <input type="checkbox" id="new-device-internet" style="width: 16px; height: 16px;">
-            <label for="new-device-internet" style="font-size: 0.78rem; color: var(--text-primary);">Device currently has 4G / Wi-Fi internet</label>
+            <input type="checkbox" id="new-device-internet">
+            <label for="new-device-internet" style="font-size: 0.8rem; font-weight: 500;">Device has active 4G Cellular Internet</label>
         </div>
 
-        <div style="display: flex; gap: 8px;">
-            <button class="sim-btn" onclick="window.app.closeAddDeviceModal()" style="flex: 1; justify-content: center;">Cancel</button>
-            <button class="sim-btn primary" onclick="window.app.confirmAddDevice()" style="flex: 1.5; justify-content: center;">Register to Mesh</button>
-        </div>
-    </div>
-</div>
-
-<!-- ===============================================================
-     Modal: Reset Confirmation Dialog
-     =============================================================== -->
-<div class="modal-backdrop-layer" id="reset-modal-backdrop">
-    <div class="modal-dialog-card" style="text-align: center;">
-        <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--accent-red-surface); color: var(--accent-red); display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto;">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="10" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="12"/>
-                <line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-        </div>
-        <div style="font-size: 1.1rem; font-weight: 800; color: var(--accent-red); margin-bottom: 6px;">
-            Reset All Mesh & Ledger Data?
-        </div>
-        <p style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 18px;">
-            This will wipe the client outbox, clear the server mesh simulation state, and restore all bank accounts to original balances.
-        </p>
         <div style="display: flex; gap: 10px;">
-            <button class="sim-btn" onclick="window.app.closeResetModal()" style="flex: 1; justify-content: center; padding: 8px;">Cancel</button>
-            <button class="sim-btn danger" onclick="window.app.confirmDemoReset()" style="flex: 1.2; justify-content: center; padding: 8px; background: var(--accent-red); color: white;">Yes, Reset State</button>
+            <button class="btn-primary" onclick="window.app.confirmAddDevice()" style="flex: 1;">Register to Cluster</button>
+            <button class="btn-secondary" onclick="window.app.closeAddDeviceModal()">Cancel</button>
         </div>
     </div>
 </div>
 
-<!-- ===============================================================
-     Modal: 5-Device Split-Screen Studio Showcase Overlay
-     =============================================================== -->
-<div class="studio-split-screen-overlay" id="studio-overlay">
-    <div class="studio-header">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 1.1rem; font-weight: 800; color: var(--text-primary);">📱 5-Device Multi-Phone Live Showcase</span>
-            <span class="status-pill settled">Live Mesh Relay</span>
+<!-- 5. Transaction Detail Drawer Modal -->
+<div class="modal-backdrop" id="tx-detail-modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-box" style="max-width: 580px;">
+        <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 6px;">Transaction Audit Record</h3>
+        <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 16px;">Cryptographic proof and state machine audit trail</p>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+            <div class="allowance-box">
+                <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Transaction Nonce & Ref</span>
+                <span style="font-family: var(--font-mono); font-size: 0.8rem;" id="tx-modal-ref">—</span>
+            </div>
+            <div class="allowance-box">
+                <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">SHA-256 Ciphertext Hash</span>
+                <span style="font-family: var(--font-mono); font-size: 0.75rem; word-break: break-all;" id="tx-modal-hash">—</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="allowance-box">
+                    <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Delivered Via Bridge</span>
+                    <span style="font-size: 0.8rem; font-weight: 600;" id="tx-modal-bridge">—</span>
+                </div>
+                <div class="allowance-box">
+                    <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">Hop Count</span>
+                    <span style="font-size: 0.8rem; font-weight: 600;" id="tx-modal-hops">—</span>
+                </div>
+            </div>
+            <div class="allowance-box">
+                <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px;">State Machine Progression</span>
+                <div id="tx-modal-events" style="font-size: 0.76rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px;">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
         </div>
-        <div style="display: flex; gap: 8px;">
-            <button class="sim-btn primary" onclick="window.app.stepSimulationHop()">Step Hop</button>
-            <button class="sim-btn" onclick="window.app.syncMeshToBank()">Sync to Bank</button>
-            <button class="sim-btn danger" onclick="window.app.toggleStudioView()">Exit Studio</button>
-        </div>
-    </div>
-    <div class="studio-phones-grid" id="studio-phones-grid">
-        <!-- Rendered dynamically via app.js -->
+
+        <button class="btn-secondary" onclick="window.app.closeTxDetailModal()" style="width: 100%;">Close Details</button>
     </div>
 </div>
 
-<!-- Core Scripts (Zero external dependencies) -->
-<script src="/js/qr.js"></script>
+<!-- 6. About & Attribution Modal -->
+<div class="modal-backdrop" id="about-modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal-box" style="max-width: 540px;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 8px;">About MeshPay (upiSETU)</h3>
+        <div class="editorial-callout" style="margin-bottom: 14px;">
+            <strong>Academic Prototype Disclosure:</strong> MeshPay is an educational simulation and engineering prototype designed to study offline payment instruction delivery over store-and-forward delay-tolerant networks. It is NOT connected to the live NPCI switch or commercial bank clearing networks.
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">
+            <strong>Open-Source Attribution:</strong> This project is built on the foundation of the open-source repository <a href="https://github.com/perryvegehan/UPI_Without_Internet" target="_blank" rel="noopener" style="color: var(--color-pine); font-weight: 600; text-decoration: underline;">perryvegehan/UPI_Without_Internet</a>.
+        </p>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 14px;">
+            <strong>Key Upgrades in upiSETU:</strong>
+            Real Web Crypto RSA-2048-OAEP + AES-256-GCM hybrid cryptography, zero plaintext PIN persistence (on-device SHA-256 hashing), dual-tier idempotency (ciphertext SHA-256 + relational semantic nonce deduplication), persistent RSA key storage, file-based relational H2 persistence, continuous camera video QR decoding, and a structured 6-part experimental testing laboratory.
+        </p>
+        <button class="btn-secondary" onclick="window.app.closeAboutModal()" style="width: 100%;">Close</button>
+    </div>
+</div>
+
+<!-- Core JavaScript Modules -->
 <script src="/js/crypto.js"></script>
 <script src="/js/db.js"></script>
 <script src="/js/mesh.js"></script>
+<script src="/js/qr.js"></script>
 <script src="/js/app.js"></script>
+
 </body>
 </html>

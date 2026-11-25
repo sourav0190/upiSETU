@@ -50,17 +50,65 @@ public class IdempotencyService {
             try {
                 if (keyRepo.existsById(packetHash)) {
                     log.warn("Packet hash {} found in database idempotency store; rejecting as duplicate",
-                            packetHash.substring(0, 12) + "...");
+                            packetHash.substring(0, Math.min(12, packetHash.length())) + "...");
                     return false;
                 }
                 keyRepo.save(new IdempotencyKey(packetHash, now, "CLAIMED", "In-flight"));
             } catch (Exception e) {
                 // Unique constraint violation in DB caught as duplicate
-                log.info("Database unique constraint caught duplicate packet {}", packetHash.substring(0, 12) + "...");
+                log.info("Database unique constraint caught duplicate packet {}",
+                        packetHash.substring(0, Math.min(12, packetHash.length())) + "...");
                 return false;
             }
         }
 
+        return true;
+    }
+
+    /**
+     * Atomically claim a semantic payment intent (sender VPA + payment nonce).
+     * Defends against re-encryption replay attacks where identical payment intents are
+     * encrypted with different random AES-GCM IVs to produce distinct ciphertexts.
+     */
+    public boolean claimSemantic(String senderVpa, String nonce) {
+        if (senderVpa == null || nonce == null || senderVpa.isBlank() || nonce.isBlank()) {
+            return true;
+        }
+
+        String semanticKey;
+        try {
+            java.security.MessageDigest sha = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] digest = sha.digest((senderVpa.toLowerCase().trim() + ":" + nonce.trim()).getBytes());
+            StringBuilder sb = new StringBuilder("sem_");
+            for (byte b : digest) {
+                sb.append(String.format("%02x", b));
+            }
+            semanticKey = sb.toString();
+        } catch (Exception e) {
+            semanticKey = "sem_" + (senderVpa.toLowerCase().trim() + ":" + nonce.trim());
+        }
+
+        Instant now = Instant.now();
+
+        // 1. In-memory check
+        Instant prev = seen.putIfAbsent(semanticKey, now);
+        if (prev != null) {
+            return false;
+        }
+
+        // 2. Persistent fallback check
+        if (keyRepo != null) {
+            try {
+                if (keyRepo.existsById(semanticKey)) {
+                    log.warn("Semantic intent {} found in database idempotency store; rejecting duplicate intent", semanticKey);
+                    return false;
+                }
+                keyRepo.save(new IdempotencyKey(semanticKey, now, "CLAIMED", "Semantic deduplication: " + senderVpa));
+            } catch (Exception e) {
+                log.info("Database unique constraint caught duplicate semantic intent {}", semanticKey);
+                return false;
+            }
+        }
         return true;
     }
 
