@@ -2947,3 +2947,210 @@ body {
     color: #6E40C9;
     border-color: #6E40C9;
 }
+
+/* ==========================================================================
+   4G HIGH-PRESSURE WATER PIPE CONDUIT (EVE BRIDGE -> CENTRAL BANK)
+   Visualizing 4G ingress as pressurized water flowing through an industrial pipe
+   ========================================================================== */
+
+.topo-conduit-bg {
+    stroke: rgba(203, 179, 232, 0.14);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .topo-conduit-bg {
+    stroke: rgba(255, 255, 255, 0.08);
+}
+
+.pipe-outer-shadow {
+    stroke: rgba(0, 0, 0, 0.38);
+    stroke-width: 22;
+    stroke-linecap: round;
+}
+
+.pipe-outer-casing {
+    stroke: #1E293B;
+    stroke-width: 18;
+    stroke-linecap: round;
+    transition: stroke 0.3s ease;
+}
+
+[data-theme="light"] .pipe-outer-casing {
+    stroke: #334155;
+}
+
+.pipe-glass-chamber {
+    stroke: rgba(56, 189, 248, 0.18);
+    stroke-width: 13;
+    stroke-linecap: round;
+}
+
+.pipe-water-body {
+    stroke: rgba(56, 189, 248, 0.3);
+    stroke-width: 9;
+    stroke-linecap: round;
+    transition: all 0.4s ease;
+}
+
+/* When Water is Flowing */
+.is-pipe-flowing .pipe-water-body {
+    stroke: url(#waterFlowGrad);
+    stroke-width: 10;
+    filter: url(#waterGlow);
+    animation: waterSurgePulse 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes waterSurgePulse {
+    0% { opacity: 0.85; stroke-width: 9.5; }
+    100% { opacity: 1; stroke-width: 11; }
+}
+
+.pipe-water-streamline {
+    stroke: transparent;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-dasharray: 14 10;
+    transition: stroke 0.3s ease;
+}
+
+.is-pipe-flowing .pipe-water-streamline {
+    stroke: #E0F7FA;
+    animation: waterFlowStream 0.65s infinite linear;
+}
+
+.pipe-water-streamline-fast {
+    stroke: transparent;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 8 14;
+    transition: stroke 0.3s ease;
+}
+
+.is-pipe-flowing .pipe-water-streamline-fast {
+    stroke: #00E5FF;
+    animation: waterFlowStream 0.45s infinite linear reverse;
+}
+
+@keyframes waterFlowStream {
+    from { stroke-dashoffset: 48; }
+    to { stroke-dashoffset: 0; }
+}
+
+/* Pipe Flange & Rings */
+.pipe-flange-ring {
+    fill: #475569;
+    stroke: #94A3B8;
+    stroke-width: 1.5;
+}
+
+.pipe-nozzle-mouth {
+    fill: #334155;
+    stroke: #00E5FF;
+    stroke-width: 1.5;
+}
+
+.pipe-nozzle-rim {
+    fill: none;
+    stroke: #38BDF8;
+    stroke-width: 2;
+}
+
+/* Rotating Valve Wheel */
+.valve-rim {
+    fill: #0F172A;
+    stroke: #38BDF8;
+    stroke-width: 2;
+}
+
+.is-valve-spinning {
+    animation: spinValveWheel 1.2s infinite linear;
+    transform-origin: 0 0;
+}
+
+@keyframes spinValveWheel {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Traveling Fluid Bubbles inside the Pipe */
+.water-bubble {
+    fill: #FFFFFF;
+    stroke: #00E5FF;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 5px #00E5FF);
+}
+
+.water-bubble.b1 { animation: bubblePulse 0.8s infinite alternate ease-in-out 0s; }
+.water-bubble.b2 { animation: bubblePulse 0.9s infinite alternate ease-in-out 0.2s; }
+.water-bubble.b3 { animation: bubblePulse 0.7s infinite alternate ease-in-out 0.4s; }
+.water-bubble.b4 { animation: bubblePulse 0.85s infinite alternate ease-in-out 0.6s; }
+.water-bubble.b5 { animation: bubblePulse 0.75s infinite alternate ease-in-out 0.8s; }
+
+@keyframes bubblePulse {
+    0% { transform: scale(0.8); opacity: 0.7; }
+    100% { transform: scale(1.3); opacity: 1; }
+}
+
+/* Splash Rings at Central Bank */
+.water-splash-ripple {
+    fill: none;
+    stroke: #38BDF8;
+    stroke-width: 2;
+    transform-origin: 0 0;
+}
+
+.water-splash-ripple.r1 { animation: rippleWave 1.4s infinite cubic-bezier(0.1, 0.8, 0.3, 1) 0s; }
+.water-splash-ripple.r2 { animation: rippleWave 1.4s infinite cubic-bezier(0.1, 0.8, 0.3, 1) 0.45s; }
+.water-splash-ripple.r3 { animation: rippleWave 1.4s infinite cubic-bezier(0.1, 0.8, 0.3, 1) 0.9s; }
+
+@keyframes rippleWave {
+    0% { transform: scale(0.7); opacity: 0.9; }
+    100% { transform: scale(1.55); opacity: 0; }
+}
+
+/* Splash Emojis */
+.splash-emoji {
+    user-select: none;
+    animation: splashBounce 1.2s infinite ease-in-out;
+}
+
+.splash-emoji.e1 { animation-delay: 0s; }
+.splash-emoji.e2 { animation-delay: 0.4s; }
+.splash-emoji.e3 { animation-delay: 0.8s; }
+
+@keyframes splashBounce {
+    0%, 100% { transform: translateY(0) scale(0.9); opacity: 0.6; }
+    50% { transform: translateY(-7px) scale(1.15); opacity: 1; }
+}
+
+/* Pipe Tag */
+.pipe-flow-tag {
+    user-select: none;
+    cursor: default;
+}
+
+.pipe-tag-bg {
+    fill: rgba(15, 23, 42, 0.85);
+    stroke: var(--border-subtle);
+    stroke-width: 1.2;
+    transition: all 0.3s ease;
+}
+
+.pipe-tag-bg.tag-flowing {
+    stroke: #00E5FF;
+    fill: rgba(8, 47, 73, 0.9);
+    filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.5));
+}
+
+.pipe-tag-text {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 700;
+    fill: #94A3B8;
+}
+
+.tag-flowing + .pipe-tag-text {
+    fill: #E0F7FA;
+}

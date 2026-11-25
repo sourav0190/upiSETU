@@ -80,6 +80,13 @@ export default function App() {
   const [linkFailureActive, setLinkFailureActive] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // 4G High-Pressure Water Pipe State (Active when packet reaches bridge / ready to upload / flushing)
+  const isWaterPipeFlowing =
+    currentStep === 3 ||
+    highlightedNodes.includes('bridge') ||
+    highlightedNodes.includes('bank') ||
+    Boolean(simStatus && (simStatus.includes('Bridge') || simStatus.includes('Central Bank') || simStatus.includes('upload')));
+
   // Alive Speech Bubble & Sticker System
   const [speechBubbles, setSpeechBubbles] = useState({
     alice: { text: "No signal down here... but MeshPay's ready!", visible: true, mood: 'idle' },
@@ -167,6 +174,21 @@ export default function App() {
           gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + idx * 0.12 + 0.1);
           osc.start(ctx.currentTime + idx * 0.12);
           osc.stop(ctx.currentTime + idx * 0.12 + 0.11);
+        });
+      } else if (type === 'water_rush') {
+        // High-pressure water pipe rushing and bubbling
+        [320, 480, 640, 800].forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.04);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.35, ctx.currentTime + idx * 0.04 + 0.32);
+          gain.gain.setValueAtTime(0.08, ctx.currentTime + idx * 0.04);
+          gain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + idx * 0.04 + 0.35);
+          osc.start(ctx.currentTime + idx * 0.04);
+          osc.stop(ctx.currentTime + idx * 0.04 + 0.36);
         });
       }
     } catch (e) {
@@ -352,13 +374,13 @@ export default function App() {
           movePacketTo(NODE_POSITIONS.dave.x, NODE_POSITIONS.dave.y, true);
 
           setTimeout(() => {
-            playSound('hop');
-            triggerBubble('bridge', 'Eve Bridge got the packet! 4G connection spotted! 🌐');
-            triggerSticker('🌉', 'Bridge Discovered!', 'Packet safely buffered in Eve 4G outbox');
+            playSound('water_rush');
+            triggerBubble('bridge', 'Eve Bridge got the packet! 4G water pipe OPEN! Flushing to Bank! 🚰🌊');
+            triggerSticker('🌊', 'Water Pipe Flowing!', 'Packet reached Eve Bridge — flushing into Bank reservoir');
             setHighlightedNodes(['bridge']);
             movePacketTo(NODE_POSITIONS.bridge.x, NODE_POSITIONS.bridge.y, true);
             setCurrentStep(3);
-            setSimStatus('Packet successfully rerouted around severed link to Eve Bridge (4G)!');
+            setSimStatus('Packet reached Eve Bridge (4G Ingress) — Ready to upload to Central Bank');
           }, 450);
         }, 450);
       } else {
@@ -369,9 +391,9 @@ export default function App() {
         movePacketTo(NODE_POSITIONS.carol.x, NODE_POSITIONS.carol.y, true);
 
         setTimeout(() => {
-          playSound('hop');
-          triggerBubble('bridge', 'Eve Bridge here! 4G cellular signal detected! 🌐');
-          triggerSticker('🗣️', 'Gossip Successful!', 'Packet hopped via Carol to Eve Bridge');
+          playSound('water_rush');
+          triggerBubble('bridge', 'Eve Bridge got the packet! 4G water pipe OPEN! Flushing to Bank! 🚰🌊');
+          triggerSticker('🌊', 'Water Pipe Flowing!', 'Packet reached Eve Bridge — flushing into Bank reservoir');
           setHighlightedNodes(['bridge']);
           movePacketTo(NODE_POSITIONS.bridge.x, NODE_POSITIONS.bridge.y, true);
           setCurrentStep(3);
@@ -401,9 +423,10 @@ export default function App() {
   // =========================================================================
   const handleSendToBank = async () => {
     setIsSubmitting(true);
-    setSimStatus('Eve Bridge uploading held packets to Central Bank via cellular uplink...');
+    playSound('water_rush');
+    setSimStatus('Eve Bridge uploading held packets to Central Bank via high-pressure 4G water pipe...');
     setHighlightedNodes(['bridge', 'bank']);
-    triggerBubble('bridge', 'Blasting packet through 4G cellular uplink to Reserve Bank! 🚀');
+    triggerBubble('bridge', 'High-pressure 4G water pipe SURGING! Envelopes flushing into Bank! 🚀🌊');
 
     movePacketTo(NODE_POSITIONS.bank.x, NODE_POSITIONS.bank.y, true);
 
@@ -929,20 +952,52 @@ export default function App() {
                   <stop offset="0%" stopColor="var(--color-pine)" stopOpacity="0.8" />
                   <stop offset="100%" stopColor="var(--color-lilac)" stopOpacity="0.8" />
                 </linearGradient>
+
+                {/* High-Pressure Flowing Water Liquid Gradient */}
+                <linearGradient id="waterFlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#00E5FF" stopOpacity="0.85" />
+                  <stop offset="35%" stopColor="#00B0FF" stopOpacity="1" />
+                  <stop offset="70%" stopColor="#00E5FF" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#2979FF" stopOpacity="0.85" />
+                </linearGradient>
+
+                {/* Fluid Glow Filter */}
+                <filter id="waterGlow" x="-30%" y="-30%" width="160%" height="160%">
+                  <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
               </defs>
               <rect width="760" height="210" fill="url(#gridDots)" />
 
-              {/* Mesh Connection Lines */}
+              {/* Mesh Connection Lines & Fluid Conduits */}
               <g className="links-layer">
                 {/* Alice -> Bob */}
+                <line x1="100" y1="100" x2="250" y2="50" className="topo-conduit-bg" />
                 <line x1="100" y1="100" x2="250" y2="50" className="topo-link" />
+
                 {/* Alice -> Carol */}
+                <line x1="100" y1="100" x2="250" y2="150" className="topo-conduit-bg" />
                 <line x1="100" y1="100" x2="250" y2="150" className="topo-link active-pulse" />
+
                 {/* Bob -> Dave */}
+                <line x1="250" y1="50" x2="410" y2="100" className="topo-conduit-bg" />
                 <line x1="250" y1="50" x2="410" y2="100" className="topo-link" />
+
                 {/* Carol -> Dave */}
+                <line x1="250" y1="150" x2="410" y2="100" className="topo-conduit-bg" />
                 <line x1="250" y1="150" x2="410" y2="100" className="topo-link" />
+
                 {/* Carol -> Bridge (May be severed in chaos mission) */}
+                <line
+                  x1="250"
+                  y1="150"
+                  x2="550"
+                  y2="150"
+                  className={`topo-conduit-bg ${linkFailureActive ? 'topo-link-severed' : ''}`}
+                />
                 <line
                   x1="250"
                   y1="150"
@@ -950,10 +1005,92 @@ export default function App() {
                   y2="150"
                   className={`topo-link ${linkFailureActive ? 'topo-link-severed' : 'active-pulse'}`}
                 />
+
                 {/* Dave -> Bridge */}
+                <line x1="410" y1="100" x2="550" y2="150" className="topo-conduit-bg" />
                 <line x1="410" y1="100" x2="550" y2="150" className="topo-link" />
-                {/* Bridge -> Bank (4G Cellular Uplink) */}
-                <line x1="550" y1="150" x2="680" y2="100" className="topo-link-4g" />
+
+                {/* =========================================================================
+                    4G HIGH-PRESSURE WATER PIPE: Eve Bridge (550, 150) -> Central Bank (680, 100)
+                    Visualized like liquid / water flowing through a high-pressure pipe
+                    ========================================================================= */}
+                <g className={`water-pipe-conduit ${isWaterPipeFlowing ? 'is-pipe-flowing' : ''}`}>
+                  {/* Outer Pipe Shadow */}
+                  <line x1="550" y1="150" x2="680" y2="100" className="pipe-outer-shadow" />
+
+                  {/* Outer Industrial Metallic Pipe Casing */}
+                  <line x1="550" y1="150" x2="680" y2="100" className="pipe-outer-casing" />
+
+                  {/* Inner Transparent Glass Chamber */}
+                  <line x1="550" y1="150" x2="680" y2="100" className="pipe-glass-chamber" />
+
+                  {/* Flowing Water Fluid Body (Cyan / Azure) */}
+                  <line x1="550" y1="150" x2="680" y2="100" className="pipe-water-body" />
+
+                  {/* High Velocity Animated Water Streamlines */}
+                  <line x1="550" y1="150" x2="680" y2="100" className="pipe-water-streamline" />
+                  <line x1="550" y1="150" x2="680" y2="100" className="pipe-water-streamline-fast" />
+
+                  {/* High-Pressure Fluid Surge Bubbles / Droplets Streaming through the Pipe */}
+                  {isWaterPipeFlowing && (
+                    <g className="pipe-bubbles-group">
+                      <circle cx="565" cy="144" r="3" className="water-bubble b1" />
+                      <circle cx="590" cy="135" r="4.5" className="water-bubble b2" />
+                      <circle cx="615" cy="125" r="3.5" className="water-bubble b3" />
+                      <circle cx="640" cy="115" r="5" className="water-bubble b4" />
+                      <circle cx="665" cy="106" r="3" className="water-bubble b5" />
+                    </g>
+                  )}
+
+                  {/* Pipe Flange & Turning Valve Wheel at Eve Bridge */}
+                  <g transform="translate(550, 150) rotate(-21)">
+                    <rect x="-4" y="-12" width="8" height="24" rx="2" className="pipe-flange-ring" />
+                    <circle cx="0" cy="-7" r="1.5" fill="#E2E8F0" />
+                    <circle cx="0" cy="7" r="1.5" fill="#E2E8F0" />
+                    {/* Rotating Valve Wheel */}
+                    <g className={`pipe-valve-wheel ${isWaterPipeFlowing ? 'is-valve-spinning' : ''}`} transform="translate(0, -18)">
+                      <circle r="7" className="valve-rim" />
+                      <line x1="-6" y1="0" x2="6" y2="0" stroke="#E2E8F0" strokeWidth="1.5" />
+                      <line x1="0" y1="-6" x2="0" y2="6" stroke="#E2E8F0" strokeWidth="1.5" />
+                      <circle r="2.5" fill="#38BDF8" />
+                    </g>
+                  </g>
+
+                  {/* Pipe Nozzle Mouth at Central Bank Entry */}
+                  <g transform="translate(680, 100) rotate(-21)">
+                    <polygon points="-6,-12 4,-8 4,8 -6,12" className="pipe-nozzle-mouth" />
+                    <circle cx="4" cy="0" r="7" className="pipe-nozzle-rim" />
+                  </g>
+
+                  {/* Water Splash & Expanding Ripples at Bank Entry */}
+                  {isWaterPipeFlowing && (
+                    <g transform="translate(680, 100)" className="bank-water-splash-group">
+                      {/* Expanding Ripple Rings in Bank Reservoir */}
+                      <circle r="28" className="water-splash-ripple r1" />
+                      <circle r="34" className="water-splash-ripple r2" />
+                      <circle r="40" className="water-splash-ripple r3" />
+                      {/* Splashing Water Droplets Spurt */}
+                      <text x="-4" y="-14" fontSize="11" className="splash-emoji e1">💦</text>
+                      <text x="14" y="-6" fontSize="10" className="splash-emoji e2">💧</text>
+                      <text x="8" y="20" fontSize="11" className="splash-emoji e3">💦</text>
+                    </g>
+                  )}
+
+                  {/* Floating Pressure & Flow Gauge Tag */}
+                  <g transform="translate(615, 112)" className="pipe-flow-tag">
+                    <rect
+                      x="-58"
+                      y="-18"
+                      width="116"
+                      height="18"
+                      rx="9"
+                      className={`pipe-tag-bg ${isWaterPipeFlowing ? 'tag-flowing' : 'tag-standby'}`}
+                    />
+                    <text textAnchor="middle" y="-6" className="pipe-tag-text">
+                      {isWaterPipeFlowing ? '🌊 4G Pipe: 100 Mb/s Flow' : '🚰 4G Pipe: Primed'}
+                    </text>
+                  </g>
+                </g>
               </g>
 
               {/* Animated Living Packet Character */}
