@@ -777,7 +777,7 @@ def convert():
   </div>
 
   <script>
-    const STORAGE_KEY = "meshpay_report_saved_html_v3";
+    const STORAGE_KEY = "meshpay_report_saved_html_v4";
     const editor = document.getElementById("editor");
     const saveStatus = document.getElementById("save-status");
     const wordCountEl = document.getElementById("word-count");

@@ -13,35 +13,37 @@
 </div>
 
 **Submitted by:**  
-- **SOURAV** (Roll No.: `«ROLL NO. – SOURAV»`)  
-- **«TEAM MEMBER 2»** (Roll No.: `«ROLL NO. – TEAM MEMBER 2»`)  
+- **Sourav Thakur** (Roll No.: `41523099`)  
+- **Sushant Sunder** (Roll No.: `41523103`)  
+- **Rajat Trehan** (Roll No.: `41523078`)  
 
-**Under the Supervision of:**  
-**«SUPERVISOR NAME & DESIGNATION»**  
+**Under the Guidance and Supervision of:**  
+**Ms. Meenu Munjal**  
+Assistant Professor & Project Mentor  
 Department of Computer Science and Engineering  
 
 **DEPARTMENT OF COMPUTER SCIENCE AND ENGINEERING**  
 **DELHI SKILL AND ENTREPRENEURSHIP UNIVERSITY (DSEU)**  
 **OKHLA-II CAMPUS, NEW DELHI – 110020, INDIA**  
-**AUGUST – NOVEMBER 2026**  
+**NOVEMBER 2026**  
 
 ---
 
 ## CANDIDATES' DECLARATION
 
-We hereby certify that the work presented in this minor project report entitled **"MESHPAY (upiSETU): SECURE OFFLINE-FIRST PEER-TO-PEER UPI PAYMENTS AND DELAY-TOLERANT MESH ROUTING ARCHITECTURE"** in partial fulfillment of the requirements for the award of the degree of **Bachelor of Technology in Computer Science and Engineering**, submitted to the Department of Computer Science and Engineering, Delhi Skill and Entrepreneurship University (DSEU), Okhla-II Campus, New Delhi, is an authentic record of our own work carried out during the period from **August 2026 to November 2026** under the supervision and guidance of **«SUPERVISOR NAME & DESIGNATION»**.
+We hereby certify that the work presented in this minor project report entitled **"MESHPAY (upiSETU): SECURE OFFLINE-FIRST PEER-TO-PEER UPI PAYMENTS AND DELAY-TOLERANT MESH ROUTING ARCHITECTURE"** in partial fulfillment of the requirements for the award of the degree of **Bachelor of Technology in Computer Science and Engineering**, submitted to the Department of Computer Science and Engineering, Delhi Skill and Entrepreneurship University (DSEU), Okhla-II Campus, New Delhi, is an authentic record of our own work carried out during the period from **August 2026 to November 2026** under the supervision and guidance of **Ms. Meenu Munjal**, Assistant Professor & Project Mentor.
 
 The matter presented in this report has not been submitted by us for the award of any other degree or diploma to this or any other University or Institute. Where other sources of information have been used, they have been duly acknowledged.
 
-<br><br>
-**SOURAV** (`«ROLL NO. – SOURAV»`)  
-B.Tech CSE, 7th Semester  
-DSEU Okhla-II Campus  
+<br>
+**1. Sourav Thakur** (Roll No.: `41523099`)  
+B.Tech CSE, 7th Semester, DSEU Okhla-II Campus  
 
-<br><br>
-**«TEAM MEMBER 2»** (`«ROLL NO. – TEAM MEMBER 2»`)  
-B.Tech CSE, 7th Semester  
-DSEU Okhla-II Campus  
+**2. Sushant Sunder** (Roll No.: `41523103`)  
+B.Tech CSE, 7th Semester, DSEU Okhla-II Campus  
+
+**3. Rajat Trehan** (Roll No.: `41523078`)  
+B.Tech CSE, 7th Semester, DSEU Okhla-II Campus  
 
 **Date:** 25th November 2026  
 **Place:** New Delhi  
@@ -50,15 +52,15 @@ DSEU Okhla-II Campus
 
 ## CERTIFICATE
 
-This is to certify that the minor project report entitled **"MESHPAY (upiSETU): SECURE OFFLINE-FIRST PEER-TO-PEER UPI PAYMENTS AND DELAY-TOLERANT MESH ROUTING ARCHITECTURE"**, submitted by **SOURAV** (`«ROLL NO. – SOURAV»`) and **«TEAM MEMBER 2»** (`«ROLL NO. – TEAM MEMBER 2»`) in partial fulfillment of the requirements for the award of the degree of **Bachelor of Technology in Computer Science and Engineering** from Delhi Skill and Entrepreneurship University (DSEU), Okhla-II Campus, New Delhi, is a bonafide record of the project work carried out under my supervision and guidance.
+This is to certify that the minor project report entitled **"MESHPAY (upiSETU): SECURE OFFLINE-FIRST PEER-TO-PEER UPI PAYMENTS AND DELAY-TOLERANT MESH ROUTING ARCHITECTURE"**, submitted by **Sourav Thakur** (`41523099`), **Sushant Sunder** (`41523103`), and **Rajat Trehan** (`41523078`) in partial fulfillment of the requirements for the award of the degree of **Bachelor of Technology in Computer Science and Engineering** from Delhi Skill and Entrepreneurship University (DSEU), Okhla-II Campus, New Delhi, is a bonafide record of the project work carried out under my supervision and guidance.
 
 To the best of my knowledge, the matter embodied in this report has not been submitted to any other University or Institute for the award of any degree or diploma.
 
 <br><br>
 _____________________________  
-**«SUPERVISOR NAME & DESIGNATION»**  
-Project Supervisor  
-Department of Computer Science and Engineering  
+**Ms. Meenu Munjal**  
+Project Supervisor & Mentor  
+Assistant Professor, Department of Computer Science and Engineering  
 DSEU Okhla-II Campus, New Delhi  
 
 <br><br>
@@ -71,7 +73,7 @@ DSEU Okhla-II Campus, New Delhi
 
 ## ACKNOWLEDGEMENT
 
-We express our profound gratitude and deep reverence to our project supervisor, **«SUPERVISOR NAME & DESIGNATION»**, Department of Computer Science and Engineering, Delhi Skill and Entrepreneurship University (DSEU), Okhla-II Campus, New Delhi, for exemplary mentorship, constant technical encouragement, and invaluable feedback throughout the conceptualization, system architecture, cryptographic formulation, and empirical testing of the **MeshPay (upiSETU)** project.
+We express our profound gratitude and deep reverence to our project supervisor, **Ms. Meenu Munjal**, Assistant Professor, Department of Computer Science and Engineering, Delhi Skill and Entrepreneurship University (DSEU), Okhla-II Campus, New Delhi, for exemplary mentorship, constant technical encouragement, and invaluable feedback throughout the conceptualization, system architecture, cryptographic formulation, and empirical testing of the **MeshPay (upiSETU)** project.
 
 We extend our sincere thanks to the **Head of Department**, Department of Computer Science and Engineering, and the **Campus Director**, DSEU Okhla-II Campus, for facilitating state-of-the-art laboratory infrastructure, computational facilities, and an encouraging research atmosphere.
 
@@ -375,8 +377,9 @@ The project was executed by a collaborative engineering team adhering to industr
 
 | TEAM MEMBER | CORE SPECIALIZATION | MODULE OWNERSHIP & RESPONSIBILITIES | DELIVERABLES |
 | :--- | :--- | :--- | :--- |
-| **SOURAV** (`«ROLL NO. – SOURAV»`) | Backend Architecture & Cryptography | - Enterprise Spring Boot 3.3.5 core settlement engine<br>- Hybrid RSA-2048-OAEP & AES-256-GCM cryptography<br>- Dual-tier idempotency cache & database schema design<br>- Multi-threaded concurrency testing & key persistence | - `SettlementService.java`<br>- `CryptoEnvelopeService.java`<br>- `ServerKeyHolder.java`<br>- Automated JUnit test suites |
-| **«TEAM MEMBER 2»** (`«ROLL NO. – TEAM MEMBER 2»`) | Frontend Design & Motion Simulation | - React 18 interactive mesh simulation UI<br>- Delay-tolerant gossip protocol state engine<br>- Metro Tunnel disaster theater & phone mockup<br>- High-pressure 4G water-pipe animation & Soundbox voice | - `App.jsx`<br>- `offlineCrypto.js`<br>- `meshSimulation.js`<br>- UI components & sound assets |
+| **Sourav Thakur** (Roll No.: `41523099`) | Project Lead & Backend/Crypto Architect | - Enterprise Spring Boot 3.3.5 core settlement engine<br>- Hybrid RSA-2048-OAEP & AES-256-GCM cryptography<br>- Dual-tier idempotency cache & database schema design<br>- Multi-threaded concurrency testing & key persistence | - `SettlementService.java`<br>- `CryptoEnvelopeService.java`<br>- `ServerKeyHolder.java`<br>- Automated JUnit test suites |
+| **Sushant Sunder** (Roll No.: `41523103`) | Delay-Tolerant Mesh & Routing Engineer | - Store-Carry-Forward epidemic gossip routing<br>- Integer-bounded hop/TTL decrement algorithm<br>- In-memory buffer management & ring deduplication<br>- Peer discovery and dynamic detour routing | - `meshSimulation.js`<br>- `MeshRoutingProtocol`<br>- Topology state machine<br>- Unit routing tests |
+| **Rajat Trehan** (Roll No.: `41523078`) | Frontend & Motion Experience Engineer | - React 18 interactive mesh simulation UI<br>- Subterranean Metro Tunnel disaster theater<br>- Pressurized 4G industrial water-pipe animation<br>- Hindi/English Soundbox voice synthesis & Cyber Lab | - `App.jsx`<br>- `offlineCrypto.js`<br>- Soundbox audio synthesis<br>- 6-part cybersecurity lab |
 
 *Table 1.1: Project Team Work Allocation and Responsibility Assignment Matrix*
 
@@ -1626,8 +1629,8 @@ The MeshPay architecture provides a foundation for several valuable extensions:
      MeshPay: A Resilient Delay-Tolerant Mesh Routing and Cryptographic Enclave Architecture
                     for Offline Peer-to-Peer Unified Payments Interface (UPI)
 ====================================================================================================
-                        Sourav (1) and Team Member 2 (2)
-         Department of Computer Science and Engineering, DSEU Okhla-II Campus, New Delhi, India
+           Sourav Thakur (1), Sushant Sunder (2), Rajat Trehan (3), and Ms. Meenu Munjal (4)
+   Department of Computer Science and Engineering, DSEU Okhla-II Campus, New Delhi – 110020, India
 ====================================================================================================
 
 ABSTRACT:
