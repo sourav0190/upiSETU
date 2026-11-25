@@ -29,12 +29,18 @@ public class SettlementService {
                               String bridgeNodeId, int hopCount) {
 
         Account sender = accounts.findById(instruction.getSenderVpa())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Unknown sender VPA: " + instruction.getSenderVpa()));
+                .orElseGet(() -> {
+                    String name = instruction.getSenderVpa().split("@")[0];
+                    Account a = new Account(instruction.getSenderVpa(), name.substring(0, 1).toUpperCase() + name.substring(1), new BigDecimal("5000.00"), instruction.getPinHash());
+                    return accounts.save(a);
+                });
 
         Account receiver = accounts.findById(instruction.getReceiverVpa())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Unknown receiver VPA: " + instruction.getReceiverVpa()));
+                .orElseGet(() -> {
+                    String name = instruction.getReceiverVpa().split("@")[0];
+                    Account a = new Account(instruction.getReceiverVpa(), name.substring(0, 1).toUpperCase() + name.substring(1), new BigDecimal("1000.00"));
+                    return accounts.save(a);
+                });
 
         BigDecimal amount = instruction.getAmount();
         if (amount.signum() <= 0) {

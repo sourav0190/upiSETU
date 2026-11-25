@@ -15,10 +15,12 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * Seeds demo accounts with default PINs and simulates device-side packet generation.
+ * Also provisions dynamic user accounts when new participants join the mesh.
  */
 @Service
 public class DemoService {
@@ -31,17 +33,44 @@ public class DemoService {
 
     @PostConstruct
     public void seedAccounts() {
-        if (accounts.count() == 0) {
-            try {
-                String defaultPinHash = sha256Hex("1234");
-                accounts.save(new Account("alice@demo", "Alice Sharma", new BigDecimal("5000.00"), defaultPinHash));
-                accounts.save(new Account("bob@demo",   "Bob Verma",    new BigDecimal("1000.00"), defaultPinHash));
-                accounts.save(new Account("carol@demo", "Carol Patel",  new BigDecimal("2500.00"), defaultPinHash));
-                accounts.save(new Account("dave@demo",  "Dave Singh",   new BigDecimal("500.00"),  defaultPinHash));
-                log.info("Seeded 4 demo accounts with default PIN 1234");
-            } catch (Exception e) {
-                log.error("Failed to seed demo accounts", e);
-            }
+        try {
+            String defaultPinHash = sha256Hex("1234");
+            ensureAccount("alice@demo", "Alice Sharma", new BigDecimal("5000.00"), defaultPinHash);
+            ensureAccount("bob@demo",   "Bob Verma",    new BigDecimal("1000.00"), defaultPinHash);
+            ensureAccount("carol@demo", "Carol Patel",  new BigDecimal("2500.00"), defaultPinHash);
+            ensureAccount("dave@demo",  "Dave Singh",   new BigDecimal("500.00"),  defaultPinHash);
+            ensureAccount("bridge@demo","Eve Bridge",   new BigDecimal("3000.00"), defaultPinHash);
+            log.info("Initialized core accounts with default PIN 1234");
+        } catch (Exception e) {
+            log.error("Failed to seed demo accounts", e);
+        }
+    }
+
+    private void ensureAccount(String vpa, String name, BigDecimal balance, String pinHash) {
+        if (!accounts.existsById(vpa)) {
+            accounts.save(new Account(vpa, name, balance, pinHash));
+        }
+    }
+
+    /**
+     * Get an existing account or automatically provision a new one with ₹5,000 balance and PIN 1234.
+     */
+    public Account getOrCreateAccount(String vpa, String holderName) {
+        if (vpa == null || vpa.isBlank()) vpa = "user_" + UUID.randomUUID().toString().substring(0, 6) + "@demo";
+        Optional<Account> opt = accounts.findById(vpa);
+        if (opt.isPresent()) return opt.get();
+
+        String name = (holderName != null && !holderName.isBlank()) ? holderName : vpa.split("@")[0];
+        try {
+            String defaultPinHash = sha256Hex("1234");
+            Account acc = new Account(vpa, name, new BigDecimal("5000.00"), defaultPinHash);
+            accounts.save(acc);
+            log.info("Auto-provisioned new account for {}: {}", vpa, name);
+            return acc;
+        } catch (Exception e) {
+            Account acc = new Account(vpa, name, new BigDecimal("5000.00"));
+            accounts.save(acc);
+            return acc;
         }
     }
 

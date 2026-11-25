@@ -1,10 +1,9 @@
 package com.demo.upimesh.controller;
 
+import com.demo.upimesh.crypto.HybridCryptoService;
+import com.demo.upimesh.crypto.ServerKeyHolder;
 import com.demo.upimesh.model.*;
-import com.demo.upimesh.service.BridgeIngestionService;
-import com.demo.upimesh.service.IdempotencyService;
-import com.demo.upimesh.service.MeshSimulatorService;
-import com.demo.upimesh.service.VirtualDevice;
+import com.demo.upimesh.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +14,8 @@ import java.util.*;
 
 /**
  * Modern RESTful API v1 for the MeshPay client application.
+ * Supports dynamic multi-device mesh synchronization (variable N nodes),
+ * wallet management, dynamic QR voucher ingest, and cybersecurity attack verification.
  */
 @RestController
 @RequestMapping("/api/v1")
@@ -28,15 +29,14 @@ public class ApiV1Controller {
     @Autowired private BridgeIngestionService bridgeService;
     @Autowired private IdempotencyService idempotencyService;
     @Autowired private MeshSimulatorService meshService;
+    @Autowired private DemoService demoService;
+    @Autowired private HybridCryptoService cryptoService;
+    @Autowired private ServerKeyHolder serverKey;
 
     // ------------------------------------------------------------- Wallet
     @GetMapping("/wallet")
     public ResponseEntity<?> getWallet(@RequestParam(value = "vpa", defaultValue = "alice@demo") String vpa) {
-        Optional<Account> accOpt = accountRepo.findById(vpa);
-        if (accOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        Account acc = accOpt.get();
+        Account acc = demoService.getOrCreateAccount(vpa, null);
 
         Map<String, Object> resp = new LinkedHashMap<>();
         resp.put("vpa", acc.getVpa());
@@ -51,6 +51,30 @@ public class ApiV1Controller {
         resp.put("availableOfflineAllowance", BigDecimal.valueOf(acc.getAvailableOfflineAllowancePaise()).divide(BigDecimal.valueOf(100)));
         resp.put("version", acc.getVersion());
         return ResponseEntity.ok(resp);
+    }
+
+    public static class TopUpRequest {
+        public String vpa;
+        public BigDecimal amount = new BigDecimal("1000.00");
+        public boolean resetAllowance = true;
+    }
+
+    @PostMapping("/wallet/topup")
+    public ResponseEntity<?> topUpWallet(@RequestBody TopUpRequest req) {
+        Account acc = demoService.getOrCreateAccount(req.vpa, null);
+        if (req.amount != null && req.amount.compareTo(BigDecimal.ZERO) > 0) {
+            acc.setBalance(acc.getBalance().add(req.amount));
+        }
+        if (req.resetAllowance) {
+            acc.setOfflineAllowanceSpentPaise(0L);
+        }
+        accountRepo.save(acc);
+        return ResponseEntity.ok(Map.of(
+                "status", "SUCCESS",
+                "message", "Wallet topped up and offline allowance reset",
+                "newBalance", acc.getBalance(),
+                "availableAllowance", BigDecimal.valueOf(acc.getAvailableOfflineAllowancePaise()).divide(BigDecimal.valueOf(100))
+        ));
     }
 
     // ------------------------------------------------------- Transactions
@@ -175,18 +199,173 @@ public class ApiV1Controller {
         ));
     }
 
-    // ----------------------------------------------------------- Devices
+    // ----------------------------------------------------------- Multi-Device Mesh
     @GetMapping("/devices")
     public ResponseEntity<?> listDevices() {
         List<Map<String, Object>> list = new ArrayList<>();
         for (VirtualDevice d : meshService.getDevices()) {
             list.add(Map.of(
                     "deviceId", d.getDeviceId(),
+                    "deviceName", d.getDeviceName(),
+                    "vpa", d.getVpa(),
                     "hasInternet", d.hasInternet(),
+                    "role", d.getRole(),
                     "packetCount", d.packetCount(),
+                    "lastHeartbeat", d.getLastHeartbeat(),
                     "packetIds", d.getHeldPackets().stream().map(MeshPacket::getPacketId).toList()
             ));
         }
         return ResponseEntity.ok(list);
+    }
+
+    public static class DeviceRegisterRequest {
+        public String deviceId;
+        public String deviceName;
+        public String vpa;
+        public Boolean hasInternet = false;
+        public String role = "RELAY";
+    }
+
+    @PostMapping("/mesh/register")
+    public ResponseEntity<?> registerDevice(@RequestBody DeviceRegisterRequest req) {
+        VirtualDevice dev = meshService.registerOrUpdateDevice(
+                req.deviceId, req.deviceName, req.vpa, Boolean.TRUE.equals(req.hasInternet), req.role);
+
+        // Ensure wallet exists for this device
+        if (dev.getVpa() != null && !dev.getVpa().isBlank()) {
+            demoService.getOrCreateAccount(dev.getVpa(), dev.getDeviceName());
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "status", "REGISTERED",
+                "deviceId", dev.getDeviceId(),
+                "deviceName", dev.getDeviceName(),
+                "vpa", dev.getVpa(),
+                "hasInternet", dev.hasInternet(),
+                "role", dev.getRole()
+        ));
+    }
+
+    public static class ToggleInternetRequest {
+        public String deviceId;
+        public boolean hasInternet;
+    }
+
+    @PostMapping("/mesh/toggle-internet")
+    public ResponseEntity<?> toggleInternet(@RequestBody ToggleInternetRequest req) {
+        boolean updated = meshService.setDeviceInternet(req.deviceId, req.hasInternet);
+        return ResponseEntity.ok(Map.of("success", updated, "deviceId", req.deviceId, "hasInternet", req.hasInternet));
+    }
+
+    public static class InjectPacketRequest {
+        public String deviceId;
+        public MeshPacket packet;
+    }
+
+    @PostMapping("/mesh/inject")
+    public ResponseEntity<?> injectPacket(@RequestBody InjectPacketRequest req) {
+        meshService.inject(req.deviceId, req.packet);
+        return ResponseEntity.ok(Map.of(
+                "status", "INJECTED",
+                "deviceId", req.deviceId,
+                "packetId", req.packet.getPacketId()
+        ));
+    }
+
+    @PostMapping("/mesh/gossip")
+    public ResponseEntity<?> gossip() {
+        MeshSimulatorService.GossipResult res = meshService.gossipOnce();
+        return ResponseEntity.ok(Map.of(
+                "transfers", res.transfers(),
+                "deviceCounts", res.deviceCounts()
+        ));
+    }
+
+    @PostMapping("/mesh/flush")
+    public ResponseEntity<?> flushBridges() {
+        List<MeshSimulatorService.BridgeUpload> uploads = meshService.collectBridgeUploads();
+        List<Map<String, Object>> results = new ArrayList<>();
+
+        for (MeshSimulatorService.BridgeUpload up : uploads) {
+            BridgeIngestionService.IngestResult r =
+                    bridgeService.ingest(up.packet(), up.bridgeNodeId(), 5 - up.packet().getTtl());
+
+            results.add(Map.of(
+                    "bridgeNode", up.bridgeNodeId(),
+                    "packetId", up.packet().getPacketId(),
+                    "outcome", r.outcome(),
+                    "reason", r.reason() == null ? "" : r.reason(),
+                    "transactionId", r.transactionId() == null ? -1 : r.transactionId(),
+                    "packetHash", r.packetHash()
+            ));
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "uploadsAttempted", uploads.size(),
+                "results", results
+        ));
+    }
+
+    @PostMapping("/mesh/reset")
+    public ResponseEntity<?> resetMesh() {
+        meshService.resetMesh();
+        idempotencyService.clear();
+        return ResponseEntity.ok(Map.of("status", "SUCCESS", "message", "Mesh state and idempotency cache cleared"));
+    }
+
+    // ----------------------------------------------------------- Cybersecurity Lab
+    public static class TamperTestRequest {
+        public MeshPacket packet;
+    }
+
+    @PostMapping("/cyber/tamper-test")
+    public ResponseEntity<?> tamperTest(@RequestBody TamperTestRequest req) {
+        if (req.packet == null || req.packet.getCiphertext() == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Packet required"));
+        }
+
+        // Intentionally tamper with ciphertext: flip 1 character in base64 string
+        char[] chars = req.packet.getCiphertext().toCharArray();
+        int mid = chars.length / 2;
+        chars[mid] = (chars[mid] == 'A') ? 'B' : 'A';
+        String tamperedCiphertext = new String(chars);
+
+        MeshPacket tamperedPkt = new MeshPacket();
+        tamperedPkt.setPacketId("tampered_" + req.packet.getPacketId());
+        tamperedPkt.setCiphertext(tamperedCiphertext);
+        tamperedPkt.setTtl(req.packet.getTtl());
+        tamperedPkt.setCreatedAt(req.packet.getCreatedAt());
+
+        BridgeIngestionService.IngestResult r = bridgeService.ingest(tamperedPkt, "adversary-mitm-node", 1);
+
+        return ResponseEntity.ok(Map.of(
+                "attackType", "CIPHERTEXT_BIT_FLIP_ATTACK",
+                "tamperedBytePosition", mid,
+                "outcome", r.outcome(),
+                "reason", r.reason(),
+                "cryptographicDefense", "AES-256-GCM Authenticated Encryption tag mismatch detected; envelope rejected without leaking balance or settling.",
+                "tamperDetected", "INVALID".equals(r.outcome())
+        ));
+    }
+
+    public static class ReplayTestRequest {
+        public MeshPacket packet;
+    }
+
+    @PostMapping("/cyber/replay-test")
+    public ResponseEntity<?> replayTest(@RequestBody ReplayTestRequest req) {
+        if (req.packet == null || req.packet.getCiphertext() == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Packet required"));
+        }
+
+        BridgeIngestionService.IngestResult r = bridgeService.ingest(req.packet, "replay-attacker-node", 1);
+
+        return ResponseEntity.ok(Map.of(
+                "attackType", "REPLAY_ATTACK",
+                "outcome", r.outcome(),
+                "reason", r.reason(),
+                "cryptographicDefense", "SHA-256 Idempotency Filter claimed atomic digest; duplicate storm neutralized with zero ledger debit.",
+                "replayBlocked", "DUPLICATE_DROPPED".equals(r.outcome())
+        ));
     }
 }
