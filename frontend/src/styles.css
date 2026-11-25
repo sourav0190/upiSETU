@@ -2291,3 +2291,659 @@ body {
     border-top: 1px solid var(--border-subtle);
     background: var(--surface-muted);
 }
+
+/* STEP EMOJI ART & VISUALS */
+.step-emoji-art {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+}
+
+.emoji-large {
+    font-size: 1.45rem;
+    display: inline-block;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.12));
+}
+
+.emoji-arrow {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 800;
+}
+
+.emoji-badge-lock,
+.emoji-badge-sound {
+    margin-left: auto;
+    font-size: 1.25rem;
+    animation: emojiBounce 2.4s infinite ease-in-out;
+}
+
+@keyframes emojiBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+.step-mini-visual {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.74rem;
+    font-weight: 700;
+    padding: 6px 10px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xs);
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.visual-tx-flow {
+    color: var(--color-pine);
+    background: var(--surface-muted);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    border: 1px dashed var(--border-strong);
+    font-size: 0.72rem;
+}
+
+[data-theme="dark"] .visual-tx-flow {
+    color: var(--color-oatmeal);
+}
+
+/* ==========================================================================
+   ALIVE NETWORK SIMULATION & STORYTELLING STYLES
+   ========================================================================== */
+
+.alive-environment {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ambient Background Floating Orbs */
+.ambient-mesh-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.ambient-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.12;
+    animation: floatOrb 18s infinite ease-in-out alternate;
+}
+
+.orb-1 {
+    width: 380px;
+    height: 380px;
+    background: var(--color-lilac);
+    top: 10%;
+    left: 15%;
+}
+
+.orb-2 {
+    width: 440px;
+    height: 440px;
+    background: var(--color-pine);
+    bottom: 10%;
+    right: 15%;
+    animation-delay: -6s;
+}
+
+.orb-3 {
+    width: 300px;
+    height: 300px;
+    background: var(--color-oatmeal);
+    top: 50%;
+    right: 35%;
+    animation-delay: -12s;
+}
+
+[data-theme="dark"] .orb-1 { opacity: 0.16; }
+[data-theme="dark"] .orb-2 { opacity: 0.22; }
+
+@keyframes floatOrb {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -40px) scale(1.1); }
+    100% { transform: translate(-30px, 30px) scale(0.95); }
+}
+
+/* Floating Sticker Reaction Toast */
+.floating-sticker-toast {
+    position: fixed;
+    top: 24px;
+    right: 28px;
+    background: var(--surface-card);
+    border: 2px solid var(--color-lilac);
+    border-radius: var(--radius-md);
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    z-index: 99999;
+    animation: stickerPop 320ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes stickerPop {
+    0% { transform: scale(0.6) translateY(-20px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.sticker-emoji {
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+}
+
+.sticker-body strong {
+    font-size: 0.92rem;
+    color: var(--text-primary);
+    display: block;
+}
+
+.sticker-body p {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin: 2px 0 0;
+}
+
+/* Mission Deck & Story Banner */
+.mission-deck-section {
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.mission-pills-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.mission-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+}
+
+.mission-tab-btn {
+    padding: 7px 14px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-card);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.mission-tab-btn:hover {
+    border-color: var(--border-strong);
+    color: var(--text-primary);
+}
+
+.mission-tab-btn.active {
+    background: var(--color-pine);
+    color: var(--color-oatmeal);
+    border-color: var(--color-pine);
+    box-shadow: 0 2px 8px rgba(31, 59, 46, 0.25);
+}
+
+[data-theme="dark"] .mission-tab-btn.active {
+    background: var(--color-oatmeal);
+    color: var(--color-pine);
+    border-color: var(--color-oatmeal);
+}
+
+.mission-story-banner {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-left: 4px solid var(--color-lilac);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    box-shadow: var(--shadow-sm);
+}
+
+.story-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(203, 179, 232, 0.25);
+    color: var(--color-lilac);
+    display: inline-block;
+    margin-bottom: 6px;
+}
+
+[data-theme="light"] .story-badge {
+    color: #6E40C9;
+    background: rgba(110, 64, 201, 0.15);
+}
+
+.story-badge.warning {
+    background: var(--accent-warning-subtle);
+    color: var(--accent-warning);
+}
+
+.story-badge.error {
+    background: var(--accent-error-subtle);
+    color: var(--accent-error);
+}
+
+.story-content h3 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.story-content p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+/* Alive Cards */
+.alive-card {
+    position: relative;
+    z-index: 1;
+    backdrop-filter: blur(8px);
+}
+
+/* SVG Speech Bubbles */
+.speech-bubble-rect {
+    fill: var(--surface-card);
+    stroke: var(--color-lilac);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+}
+
+.speech-bubble-triangle {
+    fill: var(--surface-card);
+}
+
+.speech-bubble-text {
+    font-family: var(--font-sans);
+    font-size: 9.5px;
+    font-weight: 700;
+    fill: var(--text-primary);
+    pointer-events: none;
+}
+
+/* Living Packet Character Mascot */
+.packet-aura {
+    fill: var(--color-lilac);
+    opacity: 0.35;
+    animation: auraPulse 1.2s infinite alternate ease-in-out;
+}
+
+@keyframes auraPulse {
+    0% { transform: scale(0.9); opacity: 0.25; }
+    100% { transform: scale(1.3); opacity: 0.55; }
+}
+
+.packet-capsule {
+    fill: var(--color-oatmeal);
+    stroke: var(--color-pine);
+    stroke-width: 2.2;
+    filter: drop-shadow(0 2px 8px rgba(203, 179, 232, 0.8));
+}
+
+[data-theme="dark"] .packet-capsule {
+    fill: var(--color-pine);
+    stroke: var(--color-oatmeal);
+}
+
+.node-bounce {
+    animation: nodeHopBounce 0.4s ease;
+}
+
+@keyframes nodeHopBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+.active-pulse {
+    stroke-dasharray: 6 4;
+    animation: dashPulse 1.5s infinite linear;
+}
+
+@keyframes dashPulse {
+    to { stroke-dashoffset: -20; }
+}
+
+.active-audio {
+    border-color: var(--accent-success);
+    color: var(--accent-success);
+}
+
+/* ==========================================================================
+   METRO TUNNEL UNDERGROUND SIMULATOR (SCENARIO 1)
+   ========================================================================== */
+
+.metro-tunnel-theater {
+    background: linear-gradient(180deg, #0A110D 0%, #111D17 60%, #080D0A 100%);
+    border: 1px solid rgba(203, 179, 232, 0.35);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Flickering Underground Tube Light */
+.metro-fluorescent-lamp {
+    width: 220px;
+    height: 6px;
+    background: #E8DCC6;
+    border-radius: 4px;
+    margin: 0 auto 16px;
+    box-shadow: 0 0 24px rgba(232, 220, 198, 0.7);
+    animation: tubeLightFlicker 6s infinite ease-in-out;
+}
+
+@keyframes tubeLightFlicker {
+    0%, 100% { opacity: 0.95; box-shadow: 0 0 24px rgba(232, 220, 198, 0.75); }
+    22% { opacity: 0.95; }
+    23% { opacity: 0.25; box-shadow: 0 0 4px rgba(232, 220, 198, 0.2); }
+    24% { opacity: 0.95; box-shadow: 0 0 24px rgba(232, 220, 198, 0.75); }
+    67% { opacity: 0.95; }
+    68% { opacity: 0.45; }
+    69% { opacity: 0.95; }
+}
+
+/* Metro Tunnel Header & Depth */
+.metro-tunnel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed rgba(216, 209, 196, 0.2);
+}
+
+.metro-title-group h2 {
+    color: #F5F1E8;
+    margin: 0 0 4px;
+    font-size: 1.15rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.metro-title-group p {
+    color: #A3AFA7;
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.metro-depth-indicator {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(203, 179, 232, 0.3);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-lilac);
+    font-weight: 700;
+}
+
+/* Metro Two-Column Stage */
+.metro-stage-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .metro-stage-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Simulated Smartphone Bezel */
+.phone-mockup-frame {
+    background: #000000;
+    border: 3px solid #2B3A31;
+    border-radius: 28px;
+    padding: 12px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.05);
+    position: relative;
+}
+
+.phone-screen {
+    background: #121B16;
+    border-radius: 18px;
+    padding: 14px;
+    color: #F5F1E8;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Phone Status Bar (Zero Network Indication) */
+.phone-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 12px;
+}
+
+.carrier-no-service {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #FF5C5C;
+    animation: signalSearchBlink 2s infinite ease-in-out;
+}
+
+@keyframes signalSearchBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+}
+
+.phone-sensors-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: #A3AFA7;
+}
+
+.ble-indicator-badge {
+    color: var(--color-lilac);
+    background: rgba(203, 179, 232, 0.15);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 800;
+}
+
+/* Phone Tunnel Emergency Banner */
+.phone-tunnel-banner {
+    background: rgba(184, 76, 76, 0.2);
+    border: 1px solid rgba(184, 76, 76, 0.4);
+    border-radius: var(--radius-xs);
+    padding: 8px 10px;
+    margin-bottom: 14px;
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+
+.phone-tunnel-banner strong {
+    color: #FF7B7B;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 2px;
+}
+
+.phone-app-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.phone-app-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: var(--color-pine);
+    color: var(--color-oatmeal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.phone-app-name {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #F5F1E8;
+}
+
+.phone-app-sub {
+    font-size: 0.68rem;
+    color: #A3AFA7;
+}
+
+/* Subway Platform Illustration on Right Column */
+.subway-platform-stage {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 380px;
+    position: relative;
+}
+
+/* Tunnel Concrete Arches Effect */
+.tunnel-arch-svg {
+    width: 100%;
+    height: 180px;
+    margin-bottom: 12px;
+}
+
+/* Circular BLE Waves Emitting from Alice */
+.ble-radio-pulse {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    border: 2px solid var(--color-lilac);
+    border-radius: 50%;
+    animation: bleWaveExpand 2.4s infinite cubic-bezier(0.1, 0.8, 0.3, 1);
+    pointer-events: none;
+}
+
+.ble-radio-pulse.pulse-2 {
+    animation-delay: 0.8s;
+}
+
+.ble-radio-pulse.pulse-3 {
+    animation-delay: 1.6s;
+}
+
+@keyframes bleWaveExpand {
+    0% { transform: scale(0.3); opacity: 0.9; }
+    100% { transform: scale(3.2); opacity: 0; }
+}
+
+/* Platform Tracks */
+.subway-rails-bar {
+    border-top: 3px solid #3A4E42;
+    border-bottom: 3px solid #3A4E42;
+    padding: 4px 0;
+    margin-top: auto;
+    display: flex;
+    justify-content: space-around;
+    font-family: var(--font-mono);
+    color: #2D3E34;
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    user-select: none;
+}
+
+.subway-ambient-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.tunnel-tag {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #A3AFA7;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Active Sender / Receiver Pills in Balances */
+.active-sender-pill {
+    margin-left: 8px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(31, 59, 46, 0.2);
+    color: var(--color-pine);
+    border: 1px solid var(--color-pine);
+    display: inline-block;
+}
+
+[data-theme="dark"] .active-sender-pill {
+    background: rgba(232, 220, 198, 0.2);
+    color: var(--color-oatmeal);
+    border-color: var(--color-oatmeal);
+}
+
+.active-receiver-pill {
+    margin-left: 8px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(203, 179, 232, 0.25);
+    color: var(--color-lilac);
+    border: 1px solid var(--color-lilac);
+    display: inline-block;
+}
+
+[data-theme="light"] .active-receiver-pill {
+    color: #6E40C9;
+    border-color: #6E40C9;
+}
