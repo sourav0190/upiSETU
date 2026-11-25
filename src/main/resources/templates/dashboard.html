@@ -2,16 +2,16 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>UPI Offline Mesh — Demo</title>
+    <title>UPI Offline Mesh — Live Demo (upiSETU)</title>
     <style>
         * { box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0; padding: 24px; background: #0d1117; color: #e6edf3;
         }
         h1 { margin-top: 0; color: #f0f6fc; }
-        h2 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 4px; margin-top: 32px; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        h2 { color: #58a6ff; border-bottom: 1px solid #30363d; padding-bottom: 4px; margin-top: 24px; font-size: 1.15rem; }
+        .container { max-width: 1240px; margin: 0 auto; }
         .grid { display: grid; gap: 16px; }
         .grid-2 { grid-template-columns: 1fr 1fr; }
         .grid-3 { grid-template-columns: repeat(3, 1fr); }
@@ -20,10 +20,11 @@
         }
         .device {
             border: 1px solid #30363d; border-radius: 6px; padding: 12px; margin-bottom: 8px;
-            background: #0d1117;
+            background: #0d1117; transition: border-color 0.2s ease;
         }
         .device.bridge { border-color: #2ea043; background: #052e16; }
-        .device.offline { opacity: 0.85; }
+        .device.offline { opacity: 0.95; }
+        .device.active-holding { border-color: #a371f7; box-shadow: 0 0 8px rgba(163, 113, 247, 0.4); }
         .badge {
             display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 10px;
             font-weight: 600; margin-left: 8px;
@@ -33,62 +34,82 @@
         .packet-id {
             font-family: 'Consolas', 'Monaco', monospace; font-size: 11px;
             background: #21262d; padding: 2px 6px; border-radius: 3px; margin: 2px;
-            display: inline-block;
+            display: inline-block; color: #a371f7;
         }
         button {
             background: #238636; color: white; border: none; padding: 8px 16px;
             border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;
-            margin: 4px;
+            margin: 4px; transition: all 0.2s;
         }
         button:hover { background: #2ea043; }
         button.danger { background: #da3633; }
         button.danger:hover { background: #f85149; }
         button.secondary { background: #1f6feb; }
         button.secondary:hover { background: #388bfd; }
+        button.purple { background: #8957e5; }
+        button.purple:hover { background: #a371f7; }
         input, select {
             background: #0d1117; color: #e6edf3; border: 1px solid #30363d;
             border-radius: 4px; padding: 6px 10px; font-size: 14px; margin: 4px;
         }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th, td { text-align: left; padding: 8px; border-bottom: 1px solid #30363d; }
+        th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid #30363d; }
         th { color: #8b949e; font-weight: 600; font-size: 12px; text-transform: uppercase; }
         .status-SETTLED { color: #56d364; font-weight: 600; }
         .status-REJECTED { color: #f85149; font-weight: 600; }
         .status-DUPLICATE_DROPPED { color: #d29922; font-weight: 600; }
         .status-INVALID { color: #f85149; font-weight: 600; }
         #log {
-            background: #010409; color: #7ee787; padding: 12px; border-radius: 6px;
+            background: #010409; color: #7ee787; padding: 14px; border-radius: 6px;
             font-family: 'Consolas', 'Monaco', monospace; font-size: 12px;
-            max-height: 220px; overflow-y: auto; white-space: pre-wrap;
-            border: 1px solid #30363d;
+            max-height: 240px; overflow-y: auto; white-space: pre-wrap;
+            border: 1px solid #30363d; line-height: 1.5;
         }
-        .controls { background: #161b22; padding: 16px; border-radius: 8px;
+        .controls { background: #161b22; padding: 18px; border-radius: 8px;
                     border: 1px solid #30363d; margin-bottom: 16px; }
         .step-num {
             display: inline-block; background: #58a6ff; color: white;
             border-radius: 50%; width: 24px; height: 24px; text-align: center;
-            line-height: 24px; font-weight: 600; margin-right: 8px;
+            line-height: 24px; font-weight: 600; margin-right: 8px; font-size: 12px;
         }
         .balance { font-family: 'Consolas', monospace; color: #56d364; font-weight: 600; }
         .small { font-size: 12px; color: #8b949e; }
+        .nav-bar-top {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 14px; padding: 8px 0; border-bottom: 1px solid #30363d;
+        }
+        .nav-bar-top a {
+            color: #58a6ff; font-size: 13px; text-decoration: none; font-weight: 600;
+        }
+        .nav-bar-top a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
 <div class="container">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:8px 0; border-bottom:1px solid #30363d;">
-        <a href="/" style="color:#58a6ff; font-size:13px; text-decoration:none; font-weight:600;">← Switch to Modern Fintech Workbench (upiSETU)</a>
-        <span class="badge badge-online">Upstream Classic Developer View (/classic)</span>
+
+    <!-- Top Navigation Bar -->
+    <div class="nav-bar-top">
+        <div>
+            <span style="font-weight: 700; color: #f0f6fc;">MeshPay (upiSETU)</span>
+            <span class="badge badge-online" style="margin-left: 6px;">Live Core Simulation</span>
+        </div>
+        <div>
+            <a href="/workbench">✨ Switch to Advanced React Workbench (/workbench) →</a>
+        </div>
     </div>
+
+    <!-- Title & Description -->
     <h1>📡 UPI Offline Mesh — Live Demo</h1>
-    <p class="small">
+    <p class="small" style="margin-bottom: 18px;">
         Send money in a basement with zero internet. Encrypted packets gossip from phone to phone
         until one with 4G reaches the backend.
     </p>
 
+    <!-- Main Demo Flow Controls Card -->
     <div class="controls">
         <h3 style="margin-top:0">🎬 Demo Flow</h3>
 
-        <div>
+        <div style="margin-bottom: 14px;">
             <span class="step-num">1</span><strong>Compose payment</strong> (simulates sender phone)
             <br>
             <select id="senderVpa">
@@ -108,22 +129,81 @@
             <button onclick="sendPacket()">📤 Inject into Mesh</button>
         </div>
 
-        <div style="margin-top: 16px">
+        <div style="margin-top: 14px">
             <span class="step-num">2</span><strong>Gossip</strong> — packets hop device-to-device
             <button class="secondary" onclick="gossip()">🔄 Run Gossip Round</button>
+            <button class="purple" onclick="autoHopToBridge()">⚡ Auto-Step to Bridge</button>
         </div>
 
-        <div style="margin-top: 16px">
+        <div style="margin-top: 14px">
             <span class="step-num">3</span><strong>Bridge node walks outside, hits 4G</strong>
             <button class="secondary" onclick="flushBridges()">📡 Bridges Upload to Backend</button>
             <span class="small">(parallel — exercises idempotency)</span>
         </div>
 
-        <div style="margin-top: 16px">
+        <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid #21262d; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
             <button class="danger" onclick="resetMesh()">🗑 Reset Mesh + Cache</button>
+            <span style="color: #30363d; margin: 0 4px;">|</span>
+            <button class="secondary" onclick="testReplayAttack()" style="background:#30363d;">🛡 Test Replay Attack</button>
+            <button class="secondary" onclick="testTamperAttack()" style="background:#30363d;">🛡 Test Tamper Attack</button>
+            <button class="secondary" onclick="testSoundboxVoice()" style="background:#30363d;">🔊 Test Soundbox Voice</button>
         </div>
     </div>
 
+    <!-- Live SVG Mesh Topology Visualizer -->
+    <div class="card" style="margin-bottom: 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+            <h3 style="margin: 0; font-size: 1rem; color: #58a6ff;">🗺️ Live Topology & Packet Hop Visualizer</h3>
+            <span class="small" id="sim-status-label">Status: Idle (Ready to compose)</span>
+        </div>
+        <svg id="topo-svg" viewBox="0 0 760 160" style="width: 100%; height: 160px; background: #010409; border-radius: 6px; border: 1px solid #30363d;">
+            <!-- Links Layer -->
+            <line id="link-ab" x1="90" y1="80" x2="230" y2="40" stroke="#30363d" stroke-width="2"/>
+            <line id="link-ac" x1="90" y1="80" x2="230" y2="120" stroke="#30363d" stroke-width="2"/>
+            <line id="link-bd" x1="230" y1="40" x2="380" y2="40" stroke="#30363d" stroke-width="2"/>
+            <line id="link-cd" x1="230" y1="120" x2="380" y2="80" stroke="#30363d" stroke-width="2"/>
+            <line id="link-cb" x1="230" y1="120" x2="520" y2="120" stroke="#30363d" stroke-width="2"/>
+            <line id="link-db" x1="380" y1="80" x2="520" y2="120" stroke="#30363d" stroke-width="2"/>
+            <line id="link-bb" x1="520" y1="120" x2="670" y2="80" stroke="#2ea043" stroke-width="2" stroke-dasharray="4"/>
+
+            <!-- Moving Packet Particle -->
+            <circle id="topo-packet-dot" cx="90" cy="80" r="8" fill="#a371f7" stroke="#ffffff" stroke-width="2" style="display: none; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);"/>
+
+            <!-- Nodes -->
+            <g id="node-alice" transform="translate(90,80)">
+                <circle r="22" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
+                <text text-anchor="middle" y="4" fill="#e6edf3" font-size="11" font-weight="600">Alice</text>
+                <text text-anchor="middle" y="34" fill="#8b949e" font-size="10">Payer (Offline)</text>
+            </g>
+            <g id="node-bob" transform="translate(230,40)">
+                <circle r="20" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+                <text text-anchor="middle" y="4" fill="#e6edf3" font-size="11" font-weight="600">Bob</text>
+                <text text-anchor="middle" y="32" fill="#8b949e" font-size="10">Merchant</text>
+            </g>
+            <g id="node-carol" transform="translate(230,120)">
+                <circle r="20" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+                <text text-anchor="middle" y="4" fill="#e6edf3" font-size="11" font-weight="600">Carol</text>
+                <text text-anchor="middle" y="32" fill="#8b949e" font-size="10">Hop 1</text>
+            </g>
+            <g id="node-dave" transform="translate(380,80)">
+                <circle r="20" fill="#161b22" stroke="#30363d" stroke-width="2"/>
+                <text text-anchor="middle" y="4" fill="#e6edf3" font-size="11" font-weight="600">Dave</text>
+                <text text-anchor="middle" y="32" fill="#8b949e" font-size="10">Hop 2</text>
+            </g>
+            <g id="node-bridge" transform="translate(520,120)">
+                <circle r="24" fill="#052e16" stroke="#2ea043" stroke-width="2"/>
+                <text text-anchor="middle" y="4" fill="#56d364" font-size="11" font-weight="600">Bridge</text>
+                <text text-anchor="middle" y="36" fill="#2ea043" font-size="10">Eve (4G)</text>
+            </g>
+            <g id="node-bank" transform="translate(670,80)">
+                <circle r="26" fill="#161b22" stroke="#1f6feb" stroke-width="2"/>
+                <text text-anchor="middle" y="4" fill="#58a6ff" font-size="11" font-weight="600">Bank</text>
+                <text text-anchor="middle" y="38" fill="#8b949e" font-size="10">ACID Core</text>
+            </g>
+        </svg>
+    </div>
+
+    <!-- 2-Column Grid: Devices and Balances -->
     <div class="grid grid-2">
         <div class="card">
             <h2>📱 Mesh Devices</h2>
@@ -136,110 +216,263 @@
                 <thead><tr><th>VPA</th><th>Holder</th><th>Balance</th></tr></thead>
                 <tbody></tbody>
             </table>
-            <p class="small" id="cacheInfo"></p>
+            <p class="small" id="cacheInfo" style="margin-top: 12px;"></p>
         </div>
     </div>
 
+    <!-- Transaction Ledger Card -->
     <div class="card" style="margin-top: 16px">
         <h2>📜 Transaction Ledger</h2>
         <table id="tx-table">
             <thead><tr>
                 <th>ID</th><th>From</th><th>To</th><th>Amount</th>
-                <th>Status</th><th>Bridge</th><th>Hops</th><th>Settled</th>
+                <th>Status</th><th>Bridge</th><th>Hops</th><th>Settled At</th>
             </tr></thead>
             <tbody></tbody>
         </table>
     </div>
 
+    <!-- Monospace Activity Log Card -->
     <div class="card" style="margin-top: 16px">
         <h2>🪵 Activity Log</h2>
         <div id="log"></div>
     </div>
+
 </div>
 
 <script>
+let lastCreatedPacketId = null;
+let lastSenderVpa = 'alice@demo';
+let lastAmount = 500;
+
 function log(msg) {
     const el = document.getElementById('log');
     el.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg + '\n' + el.textContent;
 }
 
+function updateTopoPacket(x, y, visible = true) {
+    const dot = document.getElementById('topo-packet-dot');
+    if (!dot) return;
+    if (visible) {
+        dot.style.display = 'block';
+        dot.setAttribute('cx', x);
+        dot.setAttribute('cy', y);
+    } else {
+        dot.style.display = 'none';
+    }
+}
+
+function announceVoice(amt, sender) {
+    if ('speechSynthesis' in window) {
+        try {
+            window.speechSynthesis.cancel();
+            const text = `MeshPay received ${amt} Rupees from ${sender}`;
+            const utt = new SpeechSynthesisUtterance(text);
+            utt.rate = 1.0;
+            const voices = window.speechSynthesis.getVoices();
+            const v = voices.find(voice => voice.lang.includes('en-IN') || voice.lang.includes('hi-IN'));
+            if (v) utt.voice = v;
+            window.speechSynthesis.speak(utt);
+        } catch (e) {}
+    }
+}
+
 async function refresh() {
-    // Mesh state
-    const m = await fetch('/api/mesh/state').then(r => r.json());
-    const devicesDiv = document.getElementById('devices');
-    devicesDiv.innerHTML = m.devices.map(d => `
-        <div class="device ${d.hasInternet ? 'bridge' : 'offline'}">
-            <strong>${d.deviceId}</strong>
-            <span class="badge ${d.hasInternet ? 'badge-online' : 'badge-offline'}">
-                ${d.hasInternet ? '🌐 4G' : '🚫 OFFLINE'}
-            </span>
-            <span class="small">holding ${d.packetCount} packet(s)</span>
-            <div>${d.packetIds.map(id => `<span class="packet-id">${id}</span>`).join('')}</div>
-        </div>
-    `).join('');
-    document.getElementById('cacheInfo').textContent =
-        `Idempotency cache size: ${m.idempotencyCacheSize}`;
+    try {
+        // Mesh state
+        const m = await fetch('/api/mesh/state').then(r => r.json());
+        const devicesDiv = document.getElementById('devices');
+        devicesDiv.innerHTML = m.devices.map(d => {
+            const hasPkt = d.packetCount > 0;
+            return `
+                <div class="device ${d.hasInternet ? 'bridge' : 'offline'} ${hasPkt ? 'active-holding' : ''}">
+                    <strong>${d.deviceId}</strong>
+                    <span class="badge ${d.hasInternet ? 'badge-online' : 'badge-offline'}">
+                        ${d.hasInternet ? '🌐 4G' : '🚫 OFFLINE'}
+                    </span>
+                    <span class="small">holding ${d.packetCount} packet(s)</span>
+                    <div>${d.packetIds.map(id => `<span class="packet-id">${id}</span>`).join('')}</div>
+                </div>
+            `;
+        }).join('');
+        document.getElementById('cacheInfo').textContent =
+            `Idempotency cache size: ${m.idempotencyCacheSize} verified hashes`;
 
-    // Accounts
-    const accs = await fetch('/api/accounts').then(r => r.json());
-    document.querySelector('#accounts-table tbody').innerHTML = accs.map(a => `
-        <tr><td>${a.vpa}</td><td>${a.holderName}</td>
-            <td class="balance">₹${parseFloat(a.balance).toFixed(2)}</td></tr>
-    `).join('');
+        // Accounts
+        const accs = await fetch('/api/accounts').then(r => r.json());
+        document.querySelector('#accounts-table tbody').innerHTML = accs.map(a => `
+            <tr><td>${a.vpa}</td><td>${a.holderName}</td>
+                <td class="balance">₹${parseFloat(a.balance).toFixed(2)}</td></tr>
+        `).join('');
 
-    // Transactions
-    const txs = await fetch('/api/transactions').then(r => r.json());
-    document.querySelector('#tx-table tbody').innerHTML = txs.map(t => `
-        <tr>
-            <td>${t.id}</td><td>${t.senderVpa}</td><td>${t.receiverVpa}</td>
-            <td class="balance">₹${parseFloat(t.amount).toFixed(2)}</td>
-            <td class="status-${t.status}">${t.status}</td>
-            <td>${t.bridgeNodeId}</td><td>${t.hopCount}</td>
-            <td class="small">${new Date(t.settledAt).toLocaleTimeString()}</td>
-        </tr>
-    `).join('');
+        // Transactions
+        const txs = await fetch('/api/transactions').then(r => r.json());
+        document.querySelector('#tx-table tbody').innerHTML = txs.map(t => `
+            <tr>
+                <td>#${t.id}</td><td>${t.senderVpa}</td><td>${t.receiverVpa}</td>
+                <td class="balance">₹${parseFloat(t.amount).toFixed(2)}</td>
+                <td class="status-${t.status}">${t.status}</td>
+                <td>${t.bridgeNodeId}</td><td>${t.hopCount}</td>
+                <td class="small">${new Date(t.settledAt || Date.now()).toLocaleTimeString()}</td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        console.warn('Refresh note:', e.message);
+    }
 }
 
 async function sendPacket() {
+    const sender = document.getElementById('senderVpa').value;
+    const receiver = document.getElementById('receiverVpa').value;
+    const amt = parseFloat(document.getElementById('amount').value);
+    const pin = document.getElementById('pin').value;
+
+    lastSenderVpa = sender;
+    lastAmount = amt;
+
     const body = {
-        senderVpa: document.getElementById('senderVpa').value,
-        receiverVpa: document.getElementById('receiverVpa').value,
-        amount: parseFloat(document.getElementById('amount').value),
-        pin: document.getElementById('pin').value,
+        senderVpa: sender,
+        receiverVpa: receiver,
+        amount: amt,
+        pin: pin,
         ttl: 5,
         startDevice: 'phone-alice'
     };
-    const r = await fetch('/api/demo/send', {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(body)
-    }).then(r => r.json());
-    log(`📤 Packet ${r.packetId.substring(0,8)} encrypted & injected at ${r.injectedAt} (TTL ${r.ttl})`);
-    log(`   ciphertext (truncated): ${r.ciphertextPreview}`);
-    refresh();
+
+    try {
+        const r = await fetch('/api/demo/send', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(body)
+        }).then(r => r.json());
+
+        lastCreatedPacketId = r.packetId;
+
+        log(`📤 Packet ${r.packetId.substring(0,8)}... encrypted with RSA-2048-OAEP & injected at Alice (TTL ${r.ttl})`);
+        log(`   Ciphertext: ${r.ciphertextPreview}`);
+
+        // Visual animation to Alice
+        updateTopoPacket(90, 80, true);
+        document.getElementById('sim-status-label').textContent = `Packet at Alice: Ready to gossip hop`;
+
+        refresh();
+    } catch (e) {
+        log(`❌ Error: ${e.message}`);
+    }
 }
 
 async function gossip() {
-    const r = await fetch('/api/mesh/gossip', {method: 'POST'}).then(r => r.json());
-    log(`🔄 Gossip: ${r.transfers} transfer(s) — ${JSON.stringify(r.deviceCounts)}`);
-    refresh();
+    try {
+        const r = await fetch('/api/mesh/gossip', {method: 'POST'}).then(r => r.json());
+        log(`🔄 Gossip Hop: ${r.transfers} transfer(s) across mesh — ${JSON.stringify(r.deviceCounts)}`);
+
+        // Move particle
+        updateTopoPacket(230, 120, true); // Carol
+        setTimeout(() => updateTopoPacket(380, 80, true), 300); // Dave
+        setTimeout(() => {
+            updateTopoPacket(520, 120, true); // Bridge
+            document.getElementById('sim-status-label').textContent = `Packet reached Eve Bridge (4G Ingress)`;
+        }, 600);
+
+        refresh();
+    } catch (e) {
+        log(`❌ Gossip error: ${e.message}`);
+    }
+}
+
+async function autoHopToBridge() {
+    log('⚡ Stepping packet across entire mesh to Bridge Node...');
+    await gossip();
+    setTimeout(() => {
+        log('✅ Packet buffered in Eve Bridge outbox. Ready to flush to bank!');
+    }, 800);
 }
 
 async function flushBridges() {
-    const r = await fetch('/api/mesh/flush', {method: 'POST'}).then(r => r.json());
-    log(`📡 ${r.uploadsAttempted} bridge upload(s):`);
-    r.results.forEach(res => {
-        log(`   ${res.bridgeNode} packet ${res.packetId} → ${res.outcome}` +
-            (res.reason ? ` (${res.reason})` : ''));
-    });
-    refresh();
+    try {
+        updateTopoPacket(670, 80, true); // Bank
+        document.getElementById('sim-status-label').textContent = `Transmitting encrypted packet to Central Bank...`;
+
+        const r = await fetch('/api/mesh/flush', {method: 'POST'}).then(r => r.json());
+        log(`📡 ${r.uploadsAttempted} bridge upload(s) to Central Bank:`);
+        r.results.forEach(res => {
+            log(`   ${res.bridgeNode} packet ${res.packetId} → ${res.outcome}` +
+                (res.reason ? ` (${res.reason})` : ''));
+        });
+
+        // Announce Soundbox speech
+        announceVoice(lastAmount, lastSenderVpa.split('@')[0]);
+
+        setTimeout(() => {
+            updateTopoPacket(670, 80, false);
+            document.getElementById('sim-status-label').textContent = `Settlement Complete! Core ledger updated.`;
+        }, 1200);
+
+        refresh();
+    } catch (e) {
+        log(`❌ Flush error: ${e.message}`);
+    }
 }
 
 async function resetMesh() {
-    await fetch('/api/mesh/reset', {method: 'POST'});
-    log('🗑 mesh + idempotency cache cleared');
-    refresh();
+    try {
+        await fetch('/api/mesh/reset', {method: 'POST'});
+        log('🗑 Mesh state, in-flight packets, and idempotency cache cleared to baseline');
+        updateTopoPacket(90, 80, false);
+        document.getElementById('sim-status-label').textContent = `Status: Idle (Ready to compose)`;
+        refresh();
+    } catch (e) {
+        log(`❌ Reset error: ${e.message}`);
+    }
 }
 
+async function testReplayAttack() {
+    log('🛡 [REPLAY TEST] Attacker attempting duplicate packet delivery to bank...');
+    try {
+        const res = await fetch('/api/v1/cyber/replay-test', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                packet: {
+                    packetId: lastCreatedPacketId || 'pkt_test',
+                    ciphertext: 'TEST_CIPHERTEXT',
+                    packetHash: 'HASH_REPLAY_TEST'
+                }
+            })
+        });
+        const data = await res.json();
+        log(`   Result: ${data.outcome} | Defense: ${data.cryptographicDefense}`);
+    } catch (e) {
+        log(`❌ Replay test note: ${e.message}`);
+    }
+}
+
+async function testTamperAttack() {
+    log('🛡 [TAMPER TEST] Attacker flipping 1 bit in AES-GCM ciphertext...');
+    try {
+        const res = await fetch('/api/v1/cyber/tamper-test', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                packet: {
+                    packetId: lastCreatedPacketId || 'pkt_test',
+                    ciphertext: 'TEST_CIPHERTEXT',
+                    packetHash: 'HASH_TAMPER_TEST'
+                }
+            })
+        });
+        const data = await res.json();
+        log(`   Result: ${data.outcome} (Reason: ${data.reason}) | Defense: ${data.cryptographicDefense}`);
+    } catch (e) {
+        log(`❌ Tamper test note: ${e.message}`);
+    }
+}
+
+function testSoundboxVoice() {
+    log('🔊 Testing Merchant Soundbox voice chime...');
+    announceVoice(500, 'Alice');
+}
+
+// Initial boot
 refresh();
 setInterval(refresh, 3000);
 </script>

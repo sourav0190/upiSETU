@@ -7,18 +7,26 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class DashboardController {
 
     /**
-     * Serves the modern MeshPay Fintech Application at root.
+     * Serves the super simple, intuitive Live Demo Dashboard at root (/).
      */
     @GetMapping("/")
     public String home() {
-        return "forward:/index.html";
+        return "dashboard";
     }
 
     /**
-     * Preserves the classic raw developer test console at /classic.
+     * Preserves /classic pointing to the same simple live demo.
      */
     @GetMapping("/classic")
     public String classic() {
         return "dashboard";
+    }
+
+    /**
+     * Serves the advanced React Fintech Workbench at /workbench.
+     */
+    @GetMapping("/workbench")
+    public String workbench() {
+        return "forward:/index.html";
     }
 }
