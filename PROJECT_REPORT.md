@@ -8,13 +8,9 @@
 *in*  
 **COMPUTER SCIENCE AND ENGINEERING**  
 
-```
-+-----------------------------------------------------------+
-|                                                           |
-|                 [INSERT DSEU LOGO HERE]                   |
-|                                                           |
-+-----------------------------------------------------------+
-```
+<div align="center">
+  <img src="dseu_logo.png" alt="Delhi Skill and Entrepreneurship University Logo" width="140" style="margin: 16px 0;" />
+</div>
 
 **Submitted by:**  
 - **SOURAV** (Roll No.: `«ROLL NO. – SOURAV»`)  

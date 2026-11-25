@@ -183,19 +183,23 @@ def create_full_report():
     # =========================================================================
     p_logo = doc.add_paragraph()
     p_logo.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_logo.paragraph_format.space_before = Pt(24)
-    p_logo.paragraph_format.space_after = Pt(12)
+    p_logo.paragraph_format.space_before = Pt(20)
+    p_logo.paragraph_format.space_after = Pt(10)
     tbl_logo = doc.add_table(rows=1, cols=1)
     tbl_logo.alignment = WD_TABLE_ALIGNMENT.CENTER
     c_logo = tbl_logo.cell(0, 0)
-    c_logo.width = Inches(3.0)
-    set_cell_margins(c_logo, top=140, bottom=140, left=140, right=140)
+    c_logo.width = Inches(2.2)
+    set_cell_margins(c_logo, top=60, bottom=60, left=60, right=60)
     p_l = c_logo.paragraphs[0]
     p_l.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_l = p_l.add_run("[INSERT DSEU LOGO HERE]")
-    r_l.font.size = Pt(10)
-    r_l.font.italic = True
-    r_l.font.color.rgb = RGBColor(120, 120, 120)
+    r_l = p_l.add_run()
+    if os.path.exists("dseu_logo.png"):
+        r_l.add_picture("dseu_logo.png", width=Inches(1.35))
+    else:
+        r_l.text = "[INSERT DSEU LOGO HERE]"
+        r_l.font.size = Pt(10)
+        r_l.font.italic = True
+        r_l.font.color.rgb = RGBColor(120, 120, 120)
 
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER

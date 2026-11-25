@@ -128,16 +128,28 @@ def convert():
                                            .replace("<", "&lt;")
                                            .replace(">", "&gt;"))
                     html_parts.append(f'<div class="code-box"><pre><code>{clean_code}</code></pre></div>')
-                elif "[INSERT DSEU LOGO HERE]" in cell_text:
-                    html_parts.append('''
-                    <div class="logo-box">
-                        <div class="logo-placeholder">
-                            <span class="logo-icon">🏛️</span><br>
-                            <strong>[INSERT DSEU LOGO HERE]</strong><br>
-                            <small style="color: #64748b;">Delhi Skill and Entrepreneurship University</small>
+                elif "[INSERT DSEU LOGO HERE]" in cell_text or "dseu" in cell_text.lower() or (len(cell.paragraphs) > 0 and 'drawing' in cell.paragraphs[0]._p.xml):
+                    import base64
+                    logo_b64 = ""
+                    if os.path.exists("dseu_logo.png"):
+                        with open("dseu_logo.png", "rb") as lf:
+                            logo_b64 = base64.b64encode(lf.read()).decode("utf-8")
+                    if logo_b64:
+                        html_parts.append(f'''
+                        <div class="logo-box">
+                            <img src="data:image/png;base64,{logo_b64}" alt="Delhi Skill and Entrepreneurship University (DSEU) Logo" style="width: 145px; height: auto; margin: 10px auto 14px auto; display: block;" />
                         </div>
-                    </div>
-                    ''')
+                        ''')
+                    else:
+                        html_parts.append('''
+                        <div class="logo-box">
+                            <div class="logo-placeholder">
+                                <span class="logo-icon">🏛️</span><br>
+                                <strong>[INSERT DSEU LOGO HERE]</strong><br>
+                                <small style="color: #64748b;">Delhi Skill and Entrepreneurship University</small>
+                            </div>
+                        </div>
+                        ''')
                 elif cell_text.startswith("[FIGURE") or cell_text.startswith("[Table") or cell_text.startswith("["):
                     clean_callout = (cell_text.replace("&", "&amp;")
                                               .replace("<", "&lt;")
@@ -742,7 +754,7 @@ def convert():
   </div>
 
   <script>
-    const STORAGE_KEY = "meshpay_report_saved_html";
+    const STORAGE_KEY = "meshpay_report_saved_html_v2";
     const editor = document.getElementById("editor");
     const saveStatus = document.getElementById("save-status");
     const wordCountEl = document.getElementById("word-count");
