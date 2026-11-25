@@ -217,7 +217,7 @@ def convert():
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MeshPay (upiSETU) — B.Tech Minor Project Report [Editable Document]</title>
+  <title>MeshPay (upiSETU) — B.Tech Minor Project Report</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
@@ -643,34 +643,49 @@ def convert():
       100% {{ transform: scale(0.95); opacity: 0.8; }}
     }}
 
+    @page {{
+      size: A4 portrait;
+      margin: 0 !important;
+    }}
+
     /* Print Styles */
     @media print {{
-      .toolbar-wrapper, .floating-stats {{
-        display: none !important;
+      @page {{
+        size: A4 portrait;
+        margin: 0 !important;
       }}
-      body {{
-        background: #ffffff;
+      html, body {{
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+      }}
+      .toolbar-wrapper, .floating-stats, #stats-badge, .save-status, .doc-badge, .doc-title-input {{
+        display: none !important;
+        visibility: hidden !important;
       }}
       .workspace {{
-        padding: 0;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: block !important;
       }}
       .document-page {{
-        box-shadow: none;
-        padding: 0.8in;
-        margin: 0;
-        width: 100%;
-        min-height: auto;
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0.8in 0.7in 0.9in 1.3in !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+        min-height: auto !important;
       }}
       .page-break {{
-        border: none;
-        height: 0;
-        margin: 0;
-        background: transparent;
-        page-break-after: always;
-        break-after: page;
+        border: none !important;
+        height: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        page-break-after: always !important;
+        break-after: page !important;
       }}
       .page-break::after {{
-        display: none;
+        display: none !important;
       }}
     }}
   </style>
@@ -697,7 +712,7 @@ def convert():
         <button class="btn btn-primary" onclick="downloadEditedHtml()" title="Download updated HTML file to your computer">
           📥 Download HTML
         </button>
-        <button class="btn" onclick="window.print()" title="Print directly or save as publication PDF">
+        <button class="btn" onclick="printCleanReport()" title="Print directly or save as publication PDF">
           🖨️ Print / Save PDF
         </button>
       </div>
@@ -777,10 +792,48 @@ def convert():
   </div>
 
   <script>
-    const STORAGE_KEY = "meshpay_report_saved_html_v4";
+    const STORAGE_KEY = "meshpay_report_saved_html_v5";
     const editor = document.getElementById("editor");
     const saveStatus = document.getElementById("save-status");
     const wordCountEl = document.getElementById("word-count");
+
+    // Clean Print function: blank document title before printing and restore afterwards
+    function printCleanReport() {{
+      const originalTitle = document.title;
+      document.title = "";
+      window.print();
+      setTimeout(() => {{
+        document.title = originalTitle;
+      }}, 1000);
+    }}
+
+    // Ensure Ctrl+P or browser menu print also suppresses title metadata
+    window.addEventListener("beforeprint", () => {{
+      window._prevTitle = document.title;
+      document.title = "";
+    }});
+    window.addEventListener("afterprint", () => {{
+      if (window._prevTitle) {{
+        document.title = window._prevTitle;
+      }}
+    }});
+
+    // Strip any unwanted pasted header/footer metadata
+    function sanitizeMetadata(root) {{
+      if (!root) return;
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+      let node;
+      const nodesToUpdate = [];
+      const pattern = /\\d{{1,2}}\\/\\d{{1,2}}\\/\\d{{2,4}},?\\s+\\d{{1,2}}:\\d{{2}}\\s*(?:AM|PM)?\\s*MeshPay\\s*\\(upiSETU\\).*?localhost:3000\\/PROJECT_REPORT\\.html/gi;
+      while ((node = walker.nextNode())) {{
+        if (pattern.test(node.nodeValue)) {{
+          nodesToUpdate.push(node);
+        }}
+      }}
+      nodesToUpdate.forEach(n => {{
+        n.nodeValue = n.nodeValue.replace(pattern, "");
+      }});
+    }}
 
     // Load saved edits if present
     window.addEventListener("DOMContentLoaded", () => {{
@@ -789,6 +842,7 @@ def convert():
         editor.innerHTML = saved;
         saveStatus.innerHTML = '<span style="color: #059669;">●</span> Restored from Browser Storage';
       }}
+      sanitizeMetadata(editor);
       updateWordCount();
     }});
 
