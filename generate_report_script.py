@@ -132,6 +132,25 @@ def create_full_report():
         r_desc.font.italic = True
         document.add_paragraph().paragraph_format.space_after = Pt(4)
 
+    def add_figure_image(document, img_path, caption, width_inches=5.6):
+        if os.path.exists(img_path):
+            p_img = document.add_paragraph()
+            p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p_img.paragraph_format.space_before = Pt(8)
+            p_img.paragraph_format.space_after = Pt(3)
+            r_img = p_img.add_run()
+            r_img.add_picture(img_path, width=Inches(width_inches))
+
+            p_cap = document.add_paragraph()
+            p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p_cap.paragraph_format.space_before = Pt(2)
+            p_cap.paragraph_format.space_after = Pt(8)
+            r_cap = p_cap.add_run(caption)
+            r_cap.font.name = "Times New Roman"
+            r_cap.font.size = Pt(9.5)
+            r_cap.font.italic = True
+            r_cap.bold = True
+
     def add_table_data(headers, rows, col_widths, caption=None):
         if caption:
             cp = doc.add_paragraph()
@@ -1172,10 +1191,19 @@ public synchronized GossipRoundResult advanceGossipRound() {
     add_table_data(["DEFECT ID", "COMPONENT", "OBSERVED ISSUE", "STATUS & RESOLUTION"], defect_data, [Inches(1.0), Inches(1.6), Inches(2.2), Inches(2.2)], "Table 5.4: Engineering Defect and Hardening Log")
 
     add_h2("5.8 User Interface Walkthrough and Visual Screenshots")
-    add_body("Below are the primary user interface modules implemented in MeshPay:")
-    add_callout_box(doc, "FIGURE 5.2: METRO TUNNEL THEATER & SENDER PHONE MOCKUP", "Displays the subterranean disaster environment (Depth: -42.5m) with flickering industrial lights, 0-bar 'NO SERVICE' phone mockup, selectable sender phone, and expanding 2.4 GHz circular BLE radio waves.")
-    add_callout_box(doc, "FIGURE 5.3: LIVING TOPOLOGY CANVAS & 4G WATER PIPE", "Visualizes live nodes (Alice, Bob, Carol, Dave, Eve Bridge, Central Bank), real-time speech bubbles, moving packet mascot, and the active pressurized 4G industrial water pipeline flowing liquid into Central Bank.")
-    add_callout_box(doc, "FIGURE 5.4: 3-STEP OFFLINE JOURNEY & VERIFIED AUDIT LEDGER", "Shows Step 1 (Seal Offline Envelope), Step 2 (Gossip Protocol with Step Hop & Auto-Run), Step 3 (Bridge 4G Settlement), paired with the real-time ACID balance table and transaction audit journal.")
+    add_body("Below are the primary user interface modules implemented and verified in MeshPay. Each figure documents a core operational stage of the offline peer-to-peer transaction lifecycle:")
+
+    add_figure_image(doc, "screenshot_wide_dashboard.png", "Figure 5.2: MeshPay Live Demonstration Interface — Step 1 Offline Envelope Composition, Zero-Connectivity Metro Disaster Environment, and Account Balances.", 5.8)
+    add_body("As depicted in Figure 5.2, the user initiates an offline payment by selecting a sender phone (Alice), entering the recipient VPA (bob@demo), the amount (₹500.00), and authorization PIN. Clicking 'Inject into Mesh' triggers the client-side Web Crypto enclave to seal the envelope locally with zero internet access.")
+
+    add_figure_image(doc, "screenshot_topology.png", "Figure 5.3: Living Network Mesh Topology Canvas with Multi-Hop Relays and Real-Time Gossip Hop Transmission Visualizer.", 5.8)
+    add_body("Figure 5.3 illustrates the real-time topological graph connecting Alice, Bob, Carol, Dave, Eve Bridge, and Central Bank. Intermediate peer nodes exchange summary vectors and forward encrypted packets along opportunistic BLE radio links.")
+
+    add_figure_image(doc, "screenshot_ledger_devices.png", "Figure 5.4: Mesh Device Buffer Queues, ACID Bank Account Balances, and Transaction Audit Journal.", 5.2)
+    add_body("As shown in Figure 5.4, each device maintains an in-memory buffer queue tracking carried packets. Upon 4G bridge upload, the backend executes atomic debit and credit updates, appending an immutable record to the transaction audit journal.")
+
+    add_figure_image(doc, "screenshot_test_suite.png", "Figure 5.5: Verified Automated Regression Test Suite Execution across 6 Test Classes (23 Passing Tests, 0 Failures).", 5.5)
+    add_body("Figure 5.5 captures the formal Maven / JUnit 5 test suite execution log validating 100% test passage across cryptographic unsealing, multi-threaded bridge race condition suppression, and persistent keypair survivability.")
 
     doc.add_page_break()
 

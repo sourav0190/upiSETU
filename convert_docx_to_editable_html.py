@@ -87,6 +87,29 @@ def convert():
 
             inner_html = "".join(run_htmls)
 
+            # Check if this paragraph is a figure caption for Figures 5.2 - 5.5
+            fig_img_map = {
+                "Figure 5.2:": "screenshot_wide_dashboard.png",
+                "Figure 5.3:": "screenshot_topology.png",
+                "Figure 5.4:": "screenshot_ledger_devices.png",
+                "Figure 5.5:": "screenshot_test_suite.png"
+            }
+            matched_fig = None
+            for f_key, f_path in fig_img_map.items():
+                if text.startswith(f_key):
+                    matched_fig = f_path
+                    break
+
+            if matched_fig and os.path.exists(matched_fig):
+                import base64
+                with open(matched_fig, "rb") as mf:
+                    mf_b64 = base64.b64encode(mf.read()).decode("utf-8")
+                html_parts.append(f'''
+                <div class="figure-container" style="text-align: center; margin: 20pt 0 8pt 0;">
+                    <img src="data:image/png;base64,{mf_b64}" alt="{text}" style="max-width: 95%; border: 1px solid #cbd5e1; border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); margin: 0 auto; display: block;" />
+                </div>
+                ''')
+
             # Detect heading styles from content
             if text.startswith("CHAPTER ") and len(text) < 20:
                 heading_tag = "h2"
@@ -754,7 +777,7 @@ def convert():
   </div>
 
   <script>
-    const STORAGE_KEY = "meshpay_report_saved_html_v2";
+    const STORAGE_KEY = "meshpay_report_saved_html_v3";
     const editor = document.getElementById("editor");
     const saveStatus = document.getElementById("save-status");
     const wordCountEl = document.getElementById("word-count");

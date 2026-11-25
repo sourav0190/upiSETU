@@ -1546,32 +1546,25 @@ During iterative development across Sprints 2 through 5, five major engineering 
 
 The MeshPay frontend is an interactive, creative web application providing visual clarity for offline peer-to-peer mesh payment dynamics:
 
-```
-+----------------------------------------------------------------------------------------------------+
-| [FIGURE 5.2: METRO TUNNEL THEATER & SENDER PHONE MOCKUP]                                           |
-| Displays the subterranean disaster environment (Depth: -42.5m) with flickering industrial lights,   |
-| 0-bar "NO SERVICE" cellular status, selectable sender smartphone mockup (Alice, Bob, Carol), and   |
-| animated 2.4 GHz expanding circular BLE radio propagation waves.                                   |
-+----------------------------------------------------------------------------------------------------+
-```
+<div align="center">
+  <img src="screenshot_wide_dashboard.png" alt="Figure 5.2: Metro Tunnel Theater & 3-Step Payment Flow" width="90%" style="border: 1px solid #cbd5e1; border-radius: 6px; margin: 14px 0 6px 0;" />
+  <p><em><strong>Figure 5.2:</strong> MeshPay Live Demonstration Interface — Step 1 Offline Envelope Composition, Zero-Connectivity Metro Disaster Environment, and Account Balances.</em></p>
+</div>
 
-```
-+----------------------------------------------------------------------------------------------------+
-| [FIGURE 5.3: LIVING TOPOLOGY CANVAS & 4G WATER PIPE]                                               |
-| Visualizes live nodes (Alice, Bob, Carol, Dave, Eve Bridge, Central Bank), real-time speech        |
-| bubbles ("Alice has a payment! 👀", "Spreading the word... 🚀"), moving packet mascot, and the    |
-| active pressurized 4G industrial water pipeline flowing liquid into Central Bank.                  |
-+----------------------------------------------------------------------------------------------------+
-```
+<div align="center">
+  <img src="screenshot_topology.png" alt="Figure 5.3: Living Network Mesh Topology Canvas" width="90%" style="border: 1px solid #cbd5e1; border-radius: 6px; margin: 14px 0 6px 0;" />
+  <p><em><strong>Figure 5.3:</strong> Living Network Mesh Topology Canvas with Multi-Hop Relays and Real-Time Gossip Hop Transmission Visualizer.</em></p>
+</div>
 
-```
-+----------------------------------------------------------------------------------------------------+
-| [FIGURE 5.4: 3-STEP OFFLINE JOURNEY & VERIFIED AUDIT LEDGER]                                       |
-| Shows Step 1 (Seal Offline Envelope), Step 2 (Gossip Protocol with Step Hop & Auto-Run),           |
-| Step 3 (Bridge 4G Settlement), paired with the real-time ACID balance table and transaction         |
-| audit journal.                                                                                     |
-+----------------------------------------------------------------------------------------------------+
-```
+<div align="center">
+  <img src="screenshot_ledger_devices.png" alt="Figure 5.4: Mesh Device Queues and Ledger" width="90%" style="border: 1px solid #cbd5e1; border-radius: 6px; margin: 14px 0 6px 0;" />
+  <p><em><strong>Figure 5.4:</strong> Mesh Device Buffer Queues, ACID Bank Account Balances, and Transaction Audit Journal.</em></p>
+</div>
+
+<div align="center">
+  <img src="screenshot_test_suite.png" alt="Figure 5.5: Verified Automated Test Suite" width="90%" style="border: 1px solid #cbd5e1; border-radius: 6px; margin: 14px 0 6px 0;" />
+  <p><em><strong>Figure 5.5:</strong> Verified Automated Regression Test Suite Execution across 6 Test Classes (23 Passing Tests, 0 Failures).</em></p>
+</div>
 
 ---
 
