@@ -7,26 +7,27 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class DashboardController {
 
     /**
-     * Serves the super simple, intuitive Live Demo Dashboard at root (/).
+     * Serves the modern, unified MeshPay React application at root (/).
      */
     @GetMapping("/")
     public String home() {
-        return "dashboard";
+        return "forward:/index.html";
     }
 
     /**
-     * Preserves /classic pointing to the same simple live demo.
+     * Consolidates routing: redirects /workbench to the primary experience at /.
+     */
+    @GetMapping("/workbench")
+    public String workbench() {
+        return "redirect:/";
+    }
+
+    /**
+     * Preserves the classic Thymeleaf developer dashboard at /classic.
      */
     @GetMapping("/classic")
     public String classic() {
         return "dashboard";
     }
-
-    /**
-     * Serves the advanced React Fintech Workbench at /workbench.
-     */
-    @GetMapping("/workbench")
-    public String workbench() {
-        return "forward:/index.html";
-    }
 }
+
